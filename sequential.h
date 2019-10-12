@@ -8,6 +8,7 @@
 #include <iostream>
 #include <initializer_list>
 #include <ctime>
+#include <vector>
 #include "tensorlib.h"
 #include "layer.h"
 #include "conv2dlayer.h"
@@ -27,6 +28,9 @@ public:
 	ftensor::Tensor operator()(const ftensor::Tensor& input) {return Forward(input);}
 	ftensor::Tensor Forward(const ftensor::Tensor& input);
 	ftensor::Tensor Backward(const ftensor::Tensor& gradient);
+
+	const std::vector<Layer*> GetLayers() {return layers_;}
+	int GetLayerNum() {return n_layers_;}
 
 private:
 	std::vector<Layer*> layers_;

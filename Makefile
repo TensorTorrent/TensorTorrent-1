@@ -16,7 +16,7 @@ CC = gcc
 build: $(TARGET)
 
 $(TARGET): main.o tensorlib.o device.o layer.o conv2dlayer.o convtranspose2dlayer.o mnistloader.o \
-	flattenlayer.o relulayer.o softmaxlayer.o linearlayer.o maxpool2dlayer.o sequential.o
+	flattenlayer.o relulayer.o softmaxlayer.o linearlayer.o maxpool2dlayer.o sequential.o optimizer.o adam.o
 # goku.o conv2dgoku.o convtranspose2dgoku.o drivers/jyn_spi.co drivers/jyn_gpio.o drivers/jyn_flash.o
 	 ${CPP} $(LDFLAGS) $^ -o $@ 
 

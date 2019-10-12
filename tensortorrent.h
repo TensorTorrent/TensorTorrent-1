@@ -19,6 +19,8 @@
 #include "linearlayer.h"
 #include "maxpool2dlayer.h"
 #include "sequential.h"
+#include "optimizer.h"
+#include "adam.h"
 #include "mnistloader.h"
 
 
