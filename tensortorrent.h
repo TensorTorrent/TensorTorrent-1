@@ -21,7 +21,11 @@
 #include "sequential.h"
 #include "optimizer.h"
 #include "adam.h"
+#include "loss.h"
+#include "crossentropyloss.h"
+#include "dataset.h"
 #include "mnistloader.h"
+#include "dataloader.h"
 
 
 #endif  // __TENSOR_TORRENT_H__

@@ -30,13 +30,26 @@ public:
 	void SetGradInput(const ftensor::Tensor& grad_input) {grad_input_ = grad_input;}
 	const ftensor::Tensor& GetGradOutput() {return grad_output_;}
 
+	bool HasWeight() {return has_weight_;}
+	bool HasBias() {return has_bias_;}
+	ftensor::Tensor* GetWeightPointer() {return &w_;}
+	ftensor::Tensor* GetWeightGradPointer() {return &dw_;}
+	ftensor::Tensor* GetBiasPointer() {return &b_;}
+	ftensor::Tensor* GetBiasGradPointer() {return &db_;}
+
 protected:
 	bool is_first_layer_;
+	bool has_weight_;
+	bool has_bias_;
 	Layer* previous_layer_;
 	ftensor::Tensor input_;
 	ftensor::Tensor output_;
 	ftensor::Tensor grad_input_;
 	ftensor::Tensor grad_output_;
+	ftensor::Tensor w_;
+	ftensor::Tensor dw_;
+	ftensor::Tensor b_;
+	ftensor::Tensor db_;
 };
 
 

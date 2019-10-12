@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "tensorlib.h"
+#include "dataset.h"
 
 using std::vector;
 
@@ -21,7 +22,6 @@ inline void EndianConvert(int &data);
 void LoadMnistLabels(std::string label_file_name, std::vector<float>&labels);
 void LoadMnistImages(std::string image_file_name, std::vector<std::vector<float> >&images);
 
-void LoadDatabase(const std::string& path, ftensor::Tensor& training_images, ftensor::Tensor& training_labels, \
-	ftensor::Tensor& testing_images, ftensor::Tensor& testing_labels);
+void MnistLoader(const std::string& path, Dataset& trainset, Dataset& testset);
 
 #endif  // __MNIST_LOADER_H__

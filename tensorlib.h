@@ -39,12 +39,14 @@ public:
 
 	TDAT Item();
 	void Clear();
+	int Size(int dim);
 	void Resize(int rows = 1, int cols = 1, int slis = 1, int gros = 1);		// Will NOT keep the data
 	TensorTemplate<TDAT> Reshape(int rows = 1, int cols = 1, int slis = 1, int gros = 1);		// Keep the data
 	void Transpose();
 	bool IsEmpty();
 	void Zeros();
 	void Ones();
+	TensorTemplate<TDAT> Sum();
 	void Info(std::ostream& out = std::cout);
 	void Show(std::ostream& out = std::cout);
 	TensorTemplate<TDAT> S(int ra = -1, int rb = -1, int ca = -1, int cb = -1, int sa = -1, int sb = -1, int ga = -1, int gb = -1);
@@ -307,6 +309,27 @@ void TensorTemplate<TDAT>::Clear() {
 
 
 template <typename TDAT>
+int TensorTemplate<TDAT>::Size(int dim) {
+	switch (dim) {
+		case 0:
+		return rows_;
+		break;
+		case 1:
+		return cols_;
+		break;
+		case 2:
+		return slis_;
+		break;
+		case 3:
+		return gros_;
+		break;
+		default:
+		T_ERROR("Dimension should be 0, 1, 2, or 3.\n");
+	}
+}
+
+
+template <typename TDAT>
 void TensorTemplate<TDAT>::Resize(int rows, int cols, int slis, int gros) {
 	if (rows < 0 || cols < 0 || slis < 0 || gros < 0) {
 	#ifdef TENSOR_DEBUG
@@ -435,6 +458,20 @@ void TensorTemplate<TDAT>::Ones() {
 	for(int i = 0; i < numel_; ++i) {
 		*data++ = static_cast<TDAT>(1);
 	}
+}
+
+
+template <typename TDAT>
+TensorTemplate<TDAT> TensorTemplate<TDAT>::Sum() {
+	TensorTemplate<TDAT> ts;
+	if (0 != numel_) {
+		ts.Resize(1, 1, 1, 1);
+		TDAT* data_ts = ts.data();
+		for (int n = 0; n < numel_; ++n) {
+			data_ts[0] += data_[n];
+		}
+	}
+	return ts;
 }
 
 
@@ -2279,7 +2316,7 @@ inline TensorTemplate<TDAT> MaxTemplate(const TensorTemplate<TDAT>& a) {
 
 
 template <typename TDAT>
-inline TensorTemplate<TDAT> MaxTemplate(const TensorTemplate<TDAT>& a, int dim) {
+inline TensorTemplate<TDAT> MaxTemplate(const TensorTemplate<TDAT>& a, int dim, TensorTemplate<TDAT>* pos) {
 	TensorTemplate<TDAT> ts;
 	int rows_a = a.rows();
 	int cols_a = a.cols();
@@ -2337,6 +2374,27 @@ inline TensorTemplate<TDAT> MaxTemplate(const TensorTemplate<TDAT>& a, int dim) 
 					}
 				}
 			}
+			if (nullptr != pos) {
+				pos->Resize(1, cols_a, slis_a, gros_a);
+				pos->Zeros();
+				TDAT* data_p = pos->data();
+				for (int g = 0; g < gros_a; ++g) {
+					int g_base_ts = g * 1 * cols_a * slis_a;
+					int g_base_a = g * rows_a * cols_a * slis_a;
+					for (int s = 0; s < slis_a; ++s) {
+						int s_base_ts = s * 1 * cols_a;
+						int s_base_a = s * rows_a * cols_a;
+						for (int r = 0; r < rows_a; ++r) {
+							for (int c = 0; c < cols_a; ++c) {
+								temp = data_a[g_base_a + s_base_a + r * cols_a + c];
+								if (temp == data_ts[g_base_ts + s_base_ts + 0 * cols_a + c]) {
+									data_p[g_base_ts + s_base_ts + 0 * cols_a + c] = r;
+								}
+							}
+						}
+					}
+				}
+			}
 			break;
 			case 1:
 			ts.Resize(rows_a, 1, slis_a, gros_a);
@@ -2357,6 +2415,27 @@ inline TensorTemplate<TDAT> MaxTemplate(const TensorTemplate<TDAT>& a, int dim) 
 							temp = data_a[g_base_a + s_base_a + r * cols_a + c];
 							if (temp > data_ts[g_base_ts + s_base_ts + r * 1 + 0]) {
 								data_ts[g_base_ts + s_base_ts + r * 1 + 0] = temp;
+							}
+						}
+					}
+				}
+			}
+			if (nullptr != pos) {
+				pos->Resize(rows_a, 1, slis_a, gros_a);
+				pos->Zeros();
+				TDAT* data_p = pos->data();
+				for (int g = 0; g < gros_a; ++g) {
+					int g_base_ts = g * rows_a * 1 * slis_a;
+					int g_base_a = g * rows_a * cols_a * slis_a;
+					for (int s = 0; s < slis_a; ++s) {
+						int s_base_ts = s * rows_a * 1;
+						int s_base_a = s * rows_a * cols_a;
+						for (int r = 0; r < rows_a; ++r) {
+							for (int c = 0; c < cols_a; ++c) {
+								temp = data_a[g_base_a + s_base_a + r * cols_a + c];
+								if (temp == data_ts[g_base_ts + s_base_ts + r * 1 + 0]) {
+									data_p[g_base_ts + s_base_ts + r * 1 + 0] = c;
+								}
 							}
 						}
 					}
@@ -2387,6 +2466,27 @@ inline TensorTemplate<TDAT> MaxTemplate(const TensorTemplate<TDAT>& a, int dim) 
 					}
 				}
 			}
+			if (nullptr != pos) {
+				pos->Resize(rows_a, cols_a, 1, gros_a);
+				pos->Zeros();
+				TDAT* data_p = pos->data();
+				for (int g = 0; g < gros_a; ++g) {
+					int g_base_ts = g * rows_a * cols_a * 1;
+					int g_base_a = g * rows_a * cols_a * slis_a;
+					for (int s = 0; s < slis_a; ++s) {
+						int s_base_ts = 0;
+						int s_base_a = s * rows_a * cols_a;
+						for (int r = 0; r < rows_a; ++r) {
+							for (int c = 0; c < cols_a; ++c) {
+								temp = data_a[g_base_a + s_base_a + r * cols_a + c];
+								if (temp == data_ts[g_base_ts + s_base_ts + r * cols_a + c]) {
+									data_p[g_base_ts + s_base_ts + r * cols_a + c] = s;
+								}
+							}
+						}
+					}
+				}
+			}
 			break;
 			case 3:
 			ts.Resize(rows_a, cols_a, slis_a, 1);
@@ -2407,6 +2507,27 @@ inline TensorTemplate<TDAT> MaxTemplate(const TensorTemplate<TDAT>& a, int dim) 
 							temp = data_a[g_base_a + s_base_a + r * cols_a + c];
 							if (temp > data_ts[g_base_ts + s_base_ts + r * cols_a + c]) {
 								data_ts[g_base_ts + s_base_ts + r * cols_a + c] = temp;
+							}
+						}
+					}
+				}
+			}
+			if (nullptr != pos) {
+				pos->Resize(rows_a, cols_a, slis_a, 1);
+				pos->Zeros();
+				TDAT* data_p = pos->data();
+				for (int g = 0; g < gros_a; ++g) {
+					int g_base_ts = 0;
+					int g_base_a = g * rows_a * cols_a * slis_a;
+					for (int s = 0; s < slis_a; ++s) {
+						int s_base_ts = s * rows_a * cols_a;
+						int s_base_a = s * rows_a * cols_a;
+						for (int r = 0; r < rows_a; ++r) {
+							for (int c = 0; c < cols_a; ++c) {
+								temp = data_a[g_base_a + s_base_a + r * cols_a + c];
+								if (temp == data_ts[g_base_ts + s_base_ts + r * cols_a + c]) {
+									data_p[g_base_ts + s_base_ts + r * cols_a + c] = g;
+								}
 							}
 						}
 					}
@@ -2453,7 +2574,7 @@ inline TensorTemplate<TDAT> MinTemplate(const TensorTemplate<TDAT>& a) {
 
 
 template <typename TDAT>
-inline TensorTemplate<TDAT> MinTemplate(const TensorTemplate<TDAT>& a, int dim) {
+inline TensorTemplate<TDAT> MinTemplate(const TensorTemplate<TDAT>& a, int dim, TensorTemplate<TDAT>* pos) {
 	TensorTemplate<TDAT> ts;
 	int rows_a = a.rows();
 	int cols_a = a.cols();
@@ -2511,6 +2632,27 @@ inline TensorTemplate<TDAT> MinTemplate(const TensorTemplate<TDAT>& a, int dim) 
 					}
 				}
 			}
+			if (nullptr != pos) {
+				pos->Resize(1, cols_a, slis_a, gros_a);
+				pos->Zeros();
+				TDAT* data_p = pos->data();
+				for (int g = 0; g < gros_a; ++g) {
+					int g_base_ts = g * 1 * cols_a * slis_a;
+					int g_base_a = g * rows_a * cols_a * slis_a;
+					for (int s = 0; s < slis_a; ++s) {
+						int s_base_ts = s * 1 * cols_a;
+						int s_base_a = s * rows_a * cols_a;
+						for (int r = 0; r < rows_a; ++r) {
+							for (int c = 0; c < cols_a; ++c) {
+								temp = data_a[g_base_a + s_base_a + r * cols_a + c];
+								if (temp == data_ts[g_base_ts + s_base_ts + 0 * cols_a + c]) {
+									data_p[g_base_ts + s_base_ts + 0 * cols_a + c] = r;
+								}
+							}
+						}
+					}
+				}
+			}
 			break;
 			case 1:
 			ts.Resize(rows_a, 1, slis_a, gros_a);
@@ -2531,6 +2673,27 @@ inline TensorTemplate<TDAT> MinTemplate(const TensorTemplate<TDAT>& a, int dim) 
 							temp = data_a[g_base_a + s_base_a + r * cols_a + c];
 							if (temp < data_ts[g_base_ts + s_base_ts + r * 1 + 0]) {
 								data_ts[g_base_ts + s_base_ts + r * 1 + 0] = temp;
+							}
+						}
+					}
+				}
+			}
+			if (nullptr != pos) {
+				pos->Resize(rows_a, 1, slis_a, gros_a);
+				pos->Zeros();
+				TDAT* data_p = pos->data();
+				for (int g = 0; g < gros_a; ++g) {
+					int g_base_ts = g * rows_a * 1 * slis_a;
+					int g_base_a = g * rows_a * cols_a * slis_a;
+					for (int s = 0; s < slis_a; ++s) {
+						int s_base_ts = s * rows_a * 1;
+						int s_base_a = s * rows_a * cols_a;
+						for (int r = 0; r < rows_a; ++r) {
+							for (int c = 0; c < cols_a; ++c) {
+								temp = data_a[g_base_a + s_base_a + r * cols_a + c];
+								if (temp == data_ts[g_base_ts + s_base_ts + r * 1 + 0]) {
+									data_p[g_base_ts + s_base_ts + r * 1 + 0] = c;
+								}
 							}
 						}
 					}
@@ -2561,6 +2724,27 @@ inline TensorTemplate<TDAT> MinTemplate(const TensorTemplate<TDAT>& a, int dim) 
 					}
 				}
 			}
+			if (nullptr != pos) {
+				pos->Resize(rows_a, cols_a, 1, gros_a);
+				pos->Zeros();
+				TDAT* data_p = pos->data();
+				for (int g = 0; g < gros_a; ++g) {
+					int g_base_ts = g * rows_a * cols_a * 1;
+					int g_base_a = g * rows_a * cols_a * slis_a;
+					for (int s = 0; s < slis_a; ++s) {
+						int s_base_ts = 0;
+						int s_base_a = s * rows_a * cols_a;
+						for (int r = 0; r < rows_a; ++r) {
+							for (int c = 0; c < cols_a; ++c) {
+								temp = data_a[g_base_a + s_base_a + r * cols_a + c];
+								if (temp == data_ts[g_base_ts + s_base_ts + r * cols_a + c]) {
+									data_p[g_base_ts + s_base_ts + r * cols_a + c] = s;
+								}
+							}
+						}
+					}
+				}
+			}
 			break;
 			case 3:
 			ts.Resize(rows_a, cols_a, slis_a, 1);
@@ -2581,6 +2765,27 @@ inline TensorTemplate<TDAT> MinTemplate(const TensorTemplate<TDAT>& a, int dim) 
 							temp = data_a[g_base_a + s_base_a + r * cols_a + c];
 							if (temp < data_ts[g_base_ts + s_base_ts + r * cols_a + c]) {
 								data_ts[g_base_ts + s_base_ts + r * cols_a + c] = temp;
+							}
+						}
+					}
+				}
+			}
+			if (nullptr != pos) {
+				pos->Resize(rows_a, cols_a, slis_a, 1);
+				pos->Zeros();
+				TDAT* data_p = pos->data();
+				for (int g = 0; g < gros_a; ++g) {
+					int g_base_ts = 0;
+					int g_base_a = g * rows_a * cols_a * slis_a;
+					for (int s = 0; s < slis_a; ++s) {
+						int s_base_ts = s * rows_a * cols_a;
+						int s_base_a = s * rows_a * cols_a;
+						for (int r = 0; r < rows_a; ++r) {
+							for (int c = 0; c < cols_a; ++c) {
+								temp = data_a[g_base_a + s_base_a + r * cols_a + c];
+								if (temp == data_ts[g_base_ts + s_base_ts + r * cols_a + c]) {
+									data_p[g_base_ts + s_base_ts + r * cols_a + c] = g;
+								}
 							}
 						}
 					}
@@ -3798,9 +4003,9 @@ Tensor Mean(const Tensor& a, int dim);
 Tensor Stddev(const Tensor& a, const std::string& ddof = "0");
 Tensor Stddev(const Tensor& a, int dim, const std::string& ddof = "0");
 Tensor Max(const Tensor& a);
-Tensor Max(const Tensor& a, int dim);
+Tensor Max(const Tensor& a, int dim, Tensor* pos = nullptr);
 Tensor Min(const Tensor& a);
-Tensor Min(const Tensor& a, int dim);
+Tensor Min(const Tensor& a, int dim, Tensor* pos = nullptr);
 Tensor operator*(const Tensor& a, const Tensor& b);
 Tensor MM(const Tensor& a, const Tensor& b);
 Tensor Where(const Tensor& a, const Tensor& b, const Tensor& c);
@@ -3868,6 +4073,7 @@ DECLARE_FUNC_T_T(operator!=, int32_t);
 DECLARE_FUNC_T(Logic);
 DECLARE_FUNC_T(operator++);
 DECLARE_FUNC_T(operator--);
+DECLARE_FUNC_T(operator-);
 
 // For itensor32 only
 DECLARE_FUNC_T(operator~);
@@ -3935,9 +4141,9 @@ Tensor Mean(const Tensor& a, int dim);
 Tensor Stddev(const Tensor& a, const std::string& ddof = "0");
 Tensor Stddev(const Tensor& a, int dim, const std::string& ddof = "0");
 Tensor Max(const Tensor& a);
-Tensor Max(const Tensor& a, int dim);
+Tensor Max(const Tensor& a, int dim, Tensor* pos = nullptr);
 Tensor Min(const Tensor& a);
-Tensor Min(const Tensor& a, int dim);
+Tensor Min(const Tensor& a, int dim, Tensor* pos = nullptr);
 Tensor operator*(const Tensor& a, const Tensor& b);
 Tensor MM(const Tensor& a, const Tensor& b);
 Tensor Where(const Tensor& a, const Tensor& b, const Tensor& c);
@@ -4005,6 +4211,7 @@ DECLARE_FUNC_T_T(operator!=, float);
 DECLARE_FUNC_T(Logic);
 DECLARE_FUNC_T(operator++);
 DECLARE_FUNC_T(operator--);
+DECLARE_FUNC_T(operator-);
 
 // For ftensor only
 Tensor Randn(int rows = 1, int cols = 1, int slis = 1, int gros = 1, float mean = 0.0, float stddev = 1.0);

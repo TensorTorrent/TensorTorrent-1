@@ -19,18 +19,12 @@ public:
 
 	ftensor::Tensor Forward(const ftensor::Tensor& input_image);
 	ftensor::Tensor Backward(const ftensor::Tensor& gradient);
-	ftensor::Tensor GetWeight() const {return weights_;}
-	void SetWeight(const ftensor::Tensor& weights);
 	void ZeroGrad();
 
 protected:
 	int in_features_;
 	int out_features_;
 	float init_range_;
-	ftensor::Tensor weights_;
-	ftensor::Tensor dw_;
-	bool using_bias_;
-	ftensor::Tensor bias_;
 };
 
 

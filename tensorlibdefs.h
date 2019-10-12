@@ -35,6 +35,8 @@
 
 #define FLOAT_SIGN(A) ((A > 0.0)? 1.0: ((A < 0.0)? -1.0: 0.0))
 
+#define NEGATIVE(A) (-A)
+
 #define INCREMENT(A) (A++)
 
 #define DECREMENT(A) (A--)

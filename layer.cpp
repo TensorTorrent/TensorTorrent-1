@@ -8,6 +8,8 @@
 Layer::Layer() {
 	is_first_layer_ = true;
 	previous_layer_ = nullptr;
+	has_weight_ = false;
+	has_bias_ = false;
 }
 
 

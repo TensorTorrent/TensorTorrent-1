@@ -91,11 +91,11 @@ void LoadMnistImages(string image_file_name, vector<vector<float> >&images)
 }
 
 
-void LoadDatabase(const std::string& path, Tensor& training_images, Tensor& training_labels, Tensor& testing_images, Tensor& testing_labels) {
+void MnistLoader(const std::string& path, Dataset& trainset, Dataset& testset) {
 
 	vector<vector<float> >* training_image_temp = new vector<vector<float> >;
 	LoadMnistImages(path + "/train-images.idx3-ubyte", *training_image_temp);
-	training_images = Reshape(Tensor(*training_image_temp), 28, 28, 1, 60000);
+	auto training_images = Reshape(Tensor(*training_image_temp), 28, 28, 1, 60000);
 	if (nullptr != training_image_temp) {
 		delete training_image_temp;
 		training_image_temp = nullptr;
@@ -103,7 +103,7 @@ void LoadDatabase(const std::string& path, Tensor& training_images, Tensor& trai
 
 	vector<vector<float> >* testing_image_temp = new vector<vector<float> >;
 	LoadMnistImages(path + "/t10k-images.idx3-ubyte", *testing_image_temp);
-	testing_images = Reshape(Tensor(*testing_image_temp), 28, 28, 1, 10000);
+	auto testing_images = Reshape(Tensor(*testing_image_temp), 28, 28, 1, 10000);
 	if (nullptr != testing_image_temp) {
 		delete testing_image_temp;
 		testing_image_temp = nullptr;
@@ -111,7 +111,7 @@ void LoadDatabase(const std::string& path, Tensor& training_images, Tensor& trai
 
 	vector<float>* training_label_temp = new vector<float>;
 	LoadMnistLabels(path + "/train-labels.idx1-ubyte", *training_label_temp);
-	training_labels = Transpose(Tensor(*training_label_temp)) + 1;
+	auto training_labels = Reshape(Transpose(Tensor(*training_label_temp)) + 1, 1, 1, 1, 60000);
 	if (nullptr != training_label_temp) {
 		delete training_label_temp;
 		training_label_temp = nullptr;
@@ -119,11 +119,14 @@ void LoadDatabase(const std::string& path, Tensor& training_images, Tensor& trai
 
 	vector<float>* testing_label_temp = new vector<float>;
 	LoadMnistLabels(path + "/t10k-labels.idx1-ubyte", *testing_label_temp);
-	testing_labels = Transpose(Tensor(*testing_label_temp)) + 1;
+	auto testing_labels = Reshape(Transpose(Tensor(*testing_label_temp)) + 1, 1, 1, 1, 10000);
 	if (nullptr != testing_label_temp) {
 		delete testing_label_temp;
 		testing_label_temp = nullptr;
 	}
+
+	trainset.Import(training_images, training_labels);
+	testset.Import(testing_images, testing_labels);
 
 	training_images.Info();
 	training_labels.Info();

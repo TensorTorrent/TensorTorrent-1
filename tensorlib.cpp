@@ -680,8 +680,8 @@ Tensor Max(const Tensor& a) {
 }
 
 
-Tensor Max(const Tensor& a, int dim) {
-	return MaxTemplate<int32_t>(a, dim);
+Tensor Max(const Tensor& a, int dim, Tensor* pos) {
+	return MaxTemplate<int32_t>(a, dim, pos);
 }
 
 
@@ -690,8 +690,8 @@ Tensor Min(const Tensor& a) {
 }
 
 
-Tensor Min(const Tensor& a, int dim) {
-	return MinTemplate<int32_t>(a, dim);
+Tensor Min(const Tensor& a, int dim, Tensor* pos) {
+	return MinTemplate<int32_t>(a, dim, pos);
 }
 
 
@@ -1122,6 +1122,7 @@ DEFINE_FUNC_T_T(operator!=, NOT_EQUAL_TO, int32_t);
 DEFINE_FUNC_T(Logic, NOT_EQUAL_TO_ZERO);
 DEFINE_FUNC_T(operator++, INCREMENT);
 DEFINE_FUNC_T(operator--, DECREMENT);
+DEFINE_FUNC_T(operator-, NEGATIVE);
 
 
 // For itensor32 only
@@ -1294,8 +1295,8 @@ Tensor Max(const Tensor& a) {
 }
 
 
-Tensor Max(const Tensor& a, int dim) {
-	return MaxTemplate<float>(a, dim);
+Tensor Max(const Tensor& a, int dim, Tensor* pos) {
+	return MaxTemplate<float>(a, dim, pos);
 }
 
 
@@ -1304,8 +1305,8 @@ Tensor Min(const Tensor& a) {
 }
 
 
-Tensor Min(const Tensor& a, int dim) {
-	return MinTemplate<float>(a, dim);
+Tensor Min(const Tensor& a, int dim, Tensor* pos) {
+	return MinTemplate<float>(a, dim, pos);
 }
 
 
@@ -1736,6 +1737,7 @@ DEFINE_FUNC_T_T(operator!=, NOT_EQUAL_TO, float);
 DEFINE_FUNC_T(Logic, NOT_EQUAL_TO_ZERO);
 DEFINE_FUNC_T(operator++, INCREMENT);
 DEFINE_FUNC_T(operator--, DECREMENT);
+DEFINE_FUNC_T(operator-, NEGATIVE);
 
 
 // For ftensor only

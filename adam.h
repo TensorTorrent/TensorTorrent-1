@@ -7,6 +7,7 @@
 
 
 #include <iostream>
+#include <vector>
 
 #include "tensorlib.h"
 #include "layer.h"
@@ -25,6 +26,12 @@ protected:
 	float beta1_;
 	float beta2_;
 	float eps_;
+	std::vector<ftensor::Tensor*> param_;
+	std::vector<ftensor::Tensor*> grad_;
+	std::vector<ftensor::Tensor> m_;
+	std::vector<ftensor::Tensor> v_;
+	int t_;
+	int n_params_;
 };
 
 
