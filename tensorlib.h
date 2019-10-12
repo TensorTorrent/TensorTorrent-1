@@ -53,6 +53,10 @@ public:
 	TDAT& operator()(int r = 0, int c = 0, int s = 0, int g = 0);
 
 	void operator=(const TensorTemplate<TDAT>& ts);
+	void operator+=(const TensorTemplate<TDAT>& ts);
+	void operator-=(const TensorTemplate<TDAT>& ts);
+	void operator*=(const TensorTemplate<TDAT>& ts);
+	void operator/=(const TensorTemplate<TDAT>& ts);
 
 	template <typename TNUM>
 	void operator=(const TNUM& num);
@@ -716,19 +720,102 @@ TDAT& TensorTemplate<TDAT>::operator()(int r, int c, int s, int g) {
 
 template <typename TDAT>
 void TensorTemplate<TDAT>::operator=(const TensorTemplate<TDAT>& ts) {
-	rows_ = ts.rows();
-	cols_ = ts.cols();
-	slis_ = ts.slis();
-	gros_ = ts.gros();
-	UPDATE_DIMS_AND_NUMEL();
-	size_t length = numel_ * sizeof(TDAT);
-	if (nullptr != data_) {
-		free(data_);
-		data_ = nullptr;
-	}
-	data_ = (TDAT*)malloc(length);
+	int rows_ts = ts.rows();
+	int cols_ts = ts.cols();
+	int slis_ts = ts.slis();
+	int gros_ts = ts.gros();
 	TDAT* data_ts = ts.data();
+	int numel_ts = ts.numel();
+	size_t length = numel_ts * sizeof(TDAT);
+	if (rows_ != rows_ts || cols_ != cols_ts || slis_ != slis_ts || gros_ != gros_ts) {
+		rows_ = rows_ts;
+		cols_ = cols_ts;
+		slis_ = slis_ts;
+		gros_ = gros_ts;
+		UPDATE_DIMS_AND_NUMEL();
+		if (nullptr != data_) {
+			free(data_);
+			data_ = nullptr;
+		}
+		data_ = (TDAT*)malloc(length);
+	}
 	memcpy(data_, data_ts, length);
+}
+
+
+template <typename TDAT>
+void TensorTemplate<TDAT>::operator+=(const TensorTemplate<TDAT>& ts) {
+	int rows_ts = ts.rows();
+	int cols_ts = ts.cols();
+	int slis_ts = ts.slis();
+	int gros_ts = ts.gros();
+	TDAT* data_ts = ts.data();
+	int numel_ts = ts.numel();
+	if (rows_ == rows_ts && cols_ == cols_ts && slis_ == slis_ts && gros_ == gros_ts) {
+		for (int n = 0; n < numel_ts; ++n) {
+			data_[n] += data_ts[n];
+		}
+	}
+	else {
+		T_ERROR("Dimension mismatched.\n");
+	}
+}
+
+
+template <typename TDAT>
+void TensorTemplate<TDAT>::operator-=(const TensorTemplate<TDAT>& ts) {
+	int rows_ts = ts.rows();
+	int cols_ts = ts.cols();
+	int slis_ts = ts.slis();
+	int gros_ts = ts.gros();
+	TDAT* data_ts = ts.data();
+	int numel_ts = ts.numel();
+	if (rows_ == rows_ts && cols_ == cols_ts && slis_ == slis_ts && gros_ == gros_ts) {
+		for (int n = 0; n < numel_ts; ++n) {
+			data_[n] -= data_ts[n];
+		}
+	}
+	else {
+		T_ERROR("Dimension mismatched.\n");
+	}
+}
+
+
+template <typename TDAT>
+void TensorTemplate<TDAT>::operator*=(const TensorTemplate<TDAT>& ts) {
+	int rows_ts = ts.rows();
+	int cols_ts = ts.cols();
+	int slis_ts = ts.slis();
+	int gros_ts = ts.gros();
+	TDAT* data_ts = ts.data();
+	int numel_ts = ts.numel();
+	if (rows_ == rows_ts && cols_ == cols_ts && slis_ == slis_ts && gros_ == gros_ts) {
+		for (int n = 0; n < numel_ts; ++n) {
+			data_[n] *= data_ts[n];
+		}
+	}
+	else {
+		T_ERROR("Dimension mismatched.\n");
+	}
+}
+
+
+template <typename TDAT>
+void TensorTemplate<TDAT>::operator/=(const TensorTemplate<TDAT>& ts) {
+	int rows_ts = ts.rows();
+	int cols_ts = ts.cols();
+	int slis_ts = ts.slis();
+	int gros_ts = ts.gros();
+	TDAT* data_ts = ts.data();
+	int numel_ts = ts.numel();
+	if (rows_ == rows_ts && cols_ == cols_ts && slis_ == slis_ts && gros_ == gros_ts) {
+		for (int n = 0; n < numel_ts; ++n) {
+			data_[n] /= data_ts[n];
+		}
+	}
+	else {
+		T_ERROR("Dimension mismatched.\n");
+	}
 }
 
 
@@ -826,9 +913,27 @@ inline TensorTemplate<TDAT> ZerosTemplate(int rows, int cols, int slis, int gros
 
 
 template <typename TDAT>
+inline TensorTemplate<TDAT> ZerosTemplate(const TensorTemplate<TDAT>& a) {
+	TensorTemplate<TDAT> ts;
+	ts.Resize(a.rows(), a.cols(), a.slis(), a.gros());
+	ts.Zeros();
+	return ts;
+}
+
+
+template <typename TDAT>
 inline TensorTemplate<TDAT> OnesTemplate(int rows, int cols, int slis, int gros) {
 	TensorTemplate<TDAT> ts;
 	ts.Resize(rows, cols, slis, gros);
+	ts.Ones();
+	return ts;
+}
+
+
+template <typename TDAT>
+inline TensorTemplate<TDAT> OnesTemplate(const TensorTemplate<TDAT>& a) {
+	TensorTemplate<TDAT> ts;
+	ts.Resize(a.rows(), a.cols(), a.slis(), a.gros());
 	ts.Ones();
 	return ts;
 }
@@ -2558,8 +2663,10 @@ inline TensorTemplate<TDAT> MMTemplate(const TensorTemplate<TDAT>& a, const Tens
 
 template <typename TDAT>
 inline TensorTemplate<TDAT> WhereTemplate(const TensorTemplate<TDAT>& a, const TensorTemplate<TDAT>& b, const TensorTemplate<TDAT>& c) {
+	int numel_a = a.numel();
+	int numel_b = b.numel();
+	int numel_c = c.numel();
 	if (MatchTemplate<TDAT>(a, b) && MatchTemplate<TDAT>(b, c)) {
-		int numel_a = a.numel();
 		TensorTemplate<TDAT> d;
 		d.Resize(a.rows(), a.cols(), a.slis(), a.gros());
 		if (0 != numel_a) {
@@ -2573,8 +2680,44 @@ inline TensorTemplate<TDAT> WhereTemplate(const TensorTemplate<TDAT>& a, const T
 		}
 		return d;
 	}
-	else if (1 == b.numel() && 1 == c.numel()) {
-		int numel_a = a.numel();
+	else if (1 == numel_a) {
+		auto data_a = a.data();
+		if (data_a[0]) {
+			return b;
+		}
+		else {
+			return c;
+		}
+	}
+	else if (1 == numel_b && MatchTemplate<TDAT>(a, c)) {
+		TensorTemplate<TDAT> d;
+		d.Resize(a.rows(), a.cols(), a.slis(), a.gros());
+		if (0 != numel_a) {
+			auto data_a = a.data();
+			auto data_b = b.data();
+			auto data_c = c.data();
+			auto data_d = d.data();
+			for (int n = 0; n < numel_a; ++n) {
+				data_d[n] = (data_a[n]? data_b[0]: data_c[n]);
+			}
+		}
+		return d;
+	}
+	else if (1 == numel_c && MatchTemplate<TDAT>(a, b)) {
+		TensorTemplate<TDAT> d;
+		d.Resize(a.rows(), a.cols(), a.slis(), a.gros());
+		if (0 != numel_a) {
+			auto data_a = a.data();
+			auto data_b = b.data();
+			auto data_c = c.data();
+			auto data_d = d.data();
+			for (int n = 0; n < numel_a; ++n) {
+				data_d[n] = (data_a[n]? data_b[n]: data_c[0]);
+			}
+		}
+		return d;
+	}
+	else if (1 == numel_b && 1 == numel_c) {
 		TensorTemplate<TDAT> d;
 		d.Resize(a.rows(), a.cols(), a.slis(), a.gros());
 		if (0 != numel_a) {
@@ -3632,7 +3775,9 @@ typedef TensorTemplate<int32_t> Tensor;
 Tensor Raw(int rows = 1, int cols = 1, int slis = 1, int gros = 1);
 Tensor Raw(const Tensor& a);
 Tensor Zeros(int rows = 1, int cols = 1, int slis = 1, int gros = 1);
+Tensor Zeros(const Tensor& a);
 Tensor Ones(int rows = 1, int cols = 1, int slis = 1, int gros = 1);
+Tensor Ones(const Tensor& a);
 Tensor Arange(int num);
 bool Match(const Tensor& a, const Tensor& b);
 int Numel(const Tensor& a);
@@ -3767,7 +3912,9 @@ typedef TensorTemplate<float> Tensor;
 Tensor Raw(int rows = 1, int cols = 1, int slis = 1, int gros = 1);
 Tensor Raw(const Tensor& a);
 Tensor Zeros(int rows = 1, int cols = 1, int slis = 1, int gros = 1);
+Tensor Zeros(const Tensor& a);
 Tensor Ones(int rows = 1, int cols = 1, int slis = 1, int gros = 1);
+Tensor Ones(const Tensor& a);
 Tensor Arange(int num);
 bool Match(const Tensor& a, const Tensor& b);
 int Numel(const Tensor& a);

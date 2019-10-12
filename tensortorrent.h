@@ -12,6 +12,13 @@
 #include "device.h"
 #include "layer.h"
 #include "conv2dlayer.h"
+#include "convtranspose2dlayer.h"
+#include "flattenlayer.h"
+#include "relulayer.h"
+#include "softmaxlayer.h"
+#include "linearlayer.h"
+#include "maxpool2dlayer.h"
+#include "sequential.h"
 #include "mnistloader.h"
 
 

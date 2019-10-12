@@ -565,8 +565,18 @@ Tensor Zeros(int rows, int cols, int slis, int gros) {
 }
 
 
+Tensor Zeros(const Tensor& a) {
+	return ZerosTemplate<int32_t>(a);
+}
+
+
 Tensor Ones(int rows, int cols, int slis, int gros) {
 	return OnesTemplate<int32_t>(rows, cols, slis, gros);
+}
+
+
+Tensor Ones(const Tensor& a) {
+	return OnesTemplate<int32_t>(a);
 }
 
 
@@ -1169,8 +1179,18 @@ Tensor Zeros(int rows, int cols, int slis, int gros) {
 }
 
 
+Tensor Zeros(const Tensor& a) {
+	return ZerosTemplate<float>(a);
+}
+
+
 Tensor Ones(int rows, int cols, int slis, int gros) {
 	return OnesTemplate<float>(rows, cols, slis, gros);
+}
+
+
+Tensor Ones(const Tensor& a) {
+	return OnesTemplate<float>(a);
 }
 
 

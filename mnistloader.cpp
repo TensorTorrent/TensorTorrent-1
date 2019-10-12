@@ -42,7 +42,10 @@ void LoadMnistLabels(string label_file_name, vector<float>&labels)
 			label_file.read((char*)&label, sizeof(label));
 			labels.push_back((float)label);
 		}
-
+	}
+	else {
+		std::cerr << "Error: File \"" << label_file_name << "\" does not exist!" << std::endl;
+		exit(1);
 	}
 }
 
@@ -81,6 +84,10 @@ void LoadMnistImages(string image_file_name, vector<vector<float> >&images)
 			images.push_back(tp);
 		}
 	}
+	else {
+		std::cerr << "Error: File \"" << image_file_name << "\" does not exist!" << std::endl;
+		exit(1);
+	}
 }
 
 
@@ -88,7 +95,7 @@ void LoadDatabase(const std::string& path, Tensor& training_images, Tensor& trai
 
 	vector<vector<float> >* training_image_temp = new vector<vector<float> >;
 	LoadMnistImages(path + "/train-images.idx3-ubyte", *training_image_temp);
-	training_images = Reshape(Tensor(*training_image_temp), 28, 28, 60000);
+	training_images = Reshape(Tensor(*training_image_temp), 28, 28, 1, 60000);
 	if (nullptr != training_image_temp) {
 		delete training_image_temp;
 		training_image_temp = nullptr;
@@ -96,7 +103,7 @@ void LoadDatabase(const std::string& path, Tensor& training_images, Tensor& trai
 
 	vector<vector<float> >* testing_image_temp = new vector<vector<float> >;
 	LoadMnistImages(path + "/t10k-images.idx3-ubyte", *testing_image_temp);
-	testing_images = Reshape(Tensor(*testing_image_temp), 28, 28, 10000);
+	testing_images = Reshape(Tensor(*testing_image_temp), 28, 28, 1, 10000);
 	if (nullptr != testing_image_temp) {
 		delete testing_image_temp;
 		testing_image_temp = nullptr;
