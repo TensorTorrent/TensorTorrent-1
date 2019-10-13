@@ -26,7 +26,7 @@ void CrossEntropyLoss::operator()(const ftensor::Tensor& outputs, const ftensor:
 	int n_examples = labels.numel();
 	Tensor reshaped_labels = Reshape(labels, 1, n_examples, 1, 1);
 	for (int i_example = 0; i_example < n_examples; ++i_example) {
-		goal(reshaped_labels(i_example) - 1, i_example) = 1;
+		goal(reshaped_labels(i_example), i_example) = 1;
 	}
 	Tensor predictions;
 	Max(outputs, 0, &predictions);

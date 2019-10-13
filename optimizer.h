@@ -17,7 +17,7 @@ class Optimizer {
 public:
 	Optimizer(Sequential& model);
 	virtual ~Optimizer();
-	virtual void ZeroGrad();
+	void ZeroGrad();
 	virtual void Step() = 0;
 
 protected:

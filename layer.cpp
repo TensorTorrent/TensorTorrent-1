@@ -5,6 +5,11 @@
 #include "layer.h"
 
 
+using namespace ftensor;
+using std::cerr;
+using std::endl;
+
+
 Layer::Layer() {
 	is_first_layer_ = true;
 	previous_layer_ = nullptr;
@@ -36,4 +41,38 @@ void Layer::Backward() {
 
 
 void Layer::ZeroGrad() {
+}
+
+
+void Layer::SetWeight(const ftensor::Tensor& w) {
+	if (has_weight_) {
+		if (Match(w, w_)) {
+			w_ = w;
+		}
+		else {
+			cerr << "Error: Dimension mismatched in weight assignment." << endl;
+			exit(1);
+		}
+	}
+	else {
+		cerr << "Error: The layer has no weight." << endl;
+		exit(1);
+	}
+}
+
+
+void Layer::SetBias(const ftensor::Tensor& b) {
+	if (has_bias_) {
+		if (Match(b, b_)) {
+			b_ = b;
+		}
+		else {
+			cerr << "Error: Dimension mismatched in weight assignment." << endl;
+			exit(1);
+		}
+	}
+	else {
+		cerr << "Error: The layer has no bias." << endl;
+		exit(1);
+	}
 }

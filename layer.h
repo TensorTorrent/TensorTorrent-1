@@ -37,6 +37,11 @@ public:
 	ftensor::Tensor* GetBiasPointer() {return &b_;}
 	ftensor::Tensor* GetBiasGradPointer() {return &db_;}
 
+	void SetWeight(const ftensor::Tensor& w);
+	const ftensor::Tensor& GetWeight() {return w_;}
+	void SetBias(const ftensor::Tensor& b);
+	const ftensor::Tensor& GetBias() {return b_;}
+	
 protected:
 	bool is_first_layer_;
 	bool has_weight_;

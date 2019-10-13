@@ -8,7 +8,7 @@ using namespace std;
 
 
 const int kBatchSize = 50;
-const int kNumEpochs = 1;
+const int kNumEpochs = 10;
 
 
 int main() {
@@ -24,11 +24,11 @@ int main() {
 	FlattenLayer f1;
 	LinearLayer l2(784, 400, false);
 	ReluLayer r3;
-	LinearLayer l4(400, 200, false);
+	LinearLayer l4(400, 120, false);
 	ReluLayer r5;
-	LinearLayer l6(200, 100, false);
+	LinearLayer l6(120, 80, false);
 	ReluLayer r7;
-	LinearLayer l8(100, 10, false);
+	LinearLayer l8(80, 10, false);
 	SoftmaxLayer s9;
 
 	// Construct the model
@@ -87,8 +87,8 @@ int main() {
 		}
 		test_loss /= test_total;
 		float test_accuracy = 100.0 * test_correct / test_total;
-		cout << "\n[Test]  Epoch:" << i_epoch << "\t\t-\t\tLoss: " << fixed << setprecision(4) << test_loss << "\t\t-\t\tAccuracy: ";
-		cout << setprecision(2) << test_accuracy << "%" << endl << flush;
+		cout << "\n[Test]   Epoch:" << i_epoch << "\t\t-\t\tLoss: " << fixed << setprecision(4) << test_loss << "\t\t-\t\tAccuracy: ";
+		cout << setprecision(2) << test_accuracy << "%" << endl << endl << flush;
 	}
 	
 	return 0;
