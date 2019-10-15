@@ -12,6 +12,8 @@ const int kNumEpochs = 10;
 
 
 int main() {
+	clock_t start, end;
+	
 	// Load the MNIST database
 	Dataset trainset, testset;
 	MnistLoader("/opt/Datasets/MNIST", trainset, testset);
@@ -24,13 +26,13 @@ int main() {
 	FlattenLayer f1;
 	LinearLayer l2(784, 400, false);
 	ReluLayer r3;
-	LinearLayer l4(400, 120, false);
+	LinearLayer l4(400, 200, false);
 	ReluLayer r5;
-	LinearLayer l6(120, 80, false);
+	LinearLayer l6(200, 100, false);
 	ReluLayer r7;
-	LinearLayer l8(80, 10, false);
+	LinearLayer l8(100, 10, false);
 	SoftmaxLayer s9;
-
+	
 	// Construct the model
 	Sequential net({&f1, &l2, &r3, &l4, &r5, &l6, &r7, &l8, &s9});
 
@@ -39,6 +41,8 @@ int main() {
 	CrossEntropyLoss criterion;
 
 	for (int i_epoch = 0; i_epoch < kNumEpochs + 1; ++i_epoch) {
+		start = clock();
+
 		if (0 != i_epoch) {
 			// Train
 			float running_loss = 0.0;
@@ -58,7 +62,7 @@ int main() {
 				train_total += train_labels.Size(3);
 				auto correct = criterion.GetCorrect();
 				train_correct += correct.Item();
-				if (0 == batch_idx % 60) {
+				if (0 == batch_idx % 150) {
 					running_loss /= train_total;
 					float train_accuracy = 100.0 * train_correct / train_total;
 					cout << "[Train]  Epoch:" << i_epoch << "\t\t-\t\tLoss: " << fixed << setprecision(4) << running_loss << "\t\t-\t\tAccuracy: ";
@@ -88,7 +92,10 @@ int main() {
 		test_loss /= test_total;
 		float test_accuracy = 100.0 * test_correct / test_total;
 		cout << "\n[Test]   Epoch:" << i_epoch << "\t\t-\t\tLoss: " << fixed << setprecision(4) << test_loss << "\t\t-\t\tAccuracy: ";
-		cout << setprecision(2) << test_accuracy << "%" << endl << endl << flush;
+		cout << setprecision(2) << test_accuracy << "%" << endl << flush;
+
+		end = clock();
+		cout << "Time elapsed: " << fixed << setprecision(9) << ((double)(end - start) / CLOCKS_PER_SEC) << " s." << endl << endl;
 	}
 	
 	return 0;

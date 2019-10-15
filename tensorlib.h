@@ -4074,6 +4074,9 @@ DECLARE_FUNC_T(Logic);
 DECLARE_FUNC_T(operator++);
 DECLARE_FUNC_T(operator--);
 DECLARE_FUNC_T(operator-);
+DECLARE_FUNC_T(IsNaN);
+DECLARE_FUNC_T(IsInf);
+DECLARE_FUNC_T(IsFinite);
 
 // For itensor32 only
 DECLARE_FUNC_T(operator~);
@@ -4212,6 +4215,9 @@ DECLARE_FUNC_T(Logic);
 DECLARE_FUNC_T(operator++);
 DECLARE_FUNC_T(operator--);
 DECLARE_FUNC_T(operator-);
+DECLARE_FUNC_T(IsNaN);
+DECLARE_FUNC_T(IsInf);
+DECLARE_FUNC_T(IsFinite);
 
 // For ftensor only
 Tensor Randn(int rows = 1, int cols = 1, int slis = 1, int gros = 1, float mean = 0.0, float stddev = 1.0);

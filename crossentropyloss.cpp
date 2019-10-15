@@ -22,7 +22,7 @@ CrossEntropyLoss::~CrossEntropyLoss() {
 
 void CrossEntropyLoss::operator()(const ftensor::Tensor& outputs, const ftensor::Tensor& labels) {
 	// Loss
-	Tensor goal = Zeros(outputs);
+	Tensor goal = 0 * outputs;
 	int n_examples = labels.numel();
 	Tensor reshaped_labels = Reshape(labels, 1, n_examples, 1, 1);
 	for (int i_example = 0; i_example < n_examples; ++i_example) {
@@ -32,7 +32,11 @@ void CrossEntropyLoss::operator()(const ftensor::Tensor& outputs, const ftensor:
 	Max(outputs, 0, &predictions);
 
 	correct_ = Sum(Where(Round(reshaped_labels) == Round(predictions), 1, 0));
-	Tensor yn0 = Where(outputs > 1 - LIMIT, 1 - LIMIT, outputs);
+
+	// Caution: Abandom infinite outputs
+	Tensor yn1 = Where(IsFinite(outputs), outputs, LIMIT);
+	
+	Tensor yn0 = Where(yn1 > 1 - LIMIT, 1 - LIMIT, yn1);
 	Tensor yn = Where(yn0 < LIMIT, LIMIT, yn0);
 
 	Tensor crossentropy = -Mul(goal, Log(yn)) - Mul(1.0 - goal, Log(1.0 - yn));

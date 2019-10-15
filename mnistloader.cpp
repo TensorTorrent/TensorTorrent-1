@@ -111,7 +111,7 @@ void MnistLoader(const std::string& path, Dataset& trainset, Dataset& testset) {
 
 	vector<float>* training_label_temp = new vector<float>;
 	LoadMnistLabels(path + "/train-labels.idx1-ubyte", *training_label_temp);
-	auto training_labels = Reshape(Transpose(Tensor(*training_label_temp)), 1, 1, 1, 60000);
+	auto training_labels = Reshape(Tensor(*training_label_temp), 1, 1, 1, 60000);
 	if (nullptr != training_label_temp) {
 		delete training_label_temp;
 		training_label_temp = nullptr;
@@ -119,7 +119,7 @@ void MnistLoader(const std::string& path, Dataset& trainset, Dataset& testset) {
 
 	vector<float>* testing_label_temp = new vector<float>;
 	LoadMnistLabels(path + "/t10k-labels.idx1-ubyte", *testing_label_temp);
-	auto testing_labels = Reshape(Transpose(Tensor(*testing_label_temp)), 1, 1, 1, 10000);
+	auto testing_labels = Reshape(Tensor(*testing_label_temp), 1, 1, 1, 10000);
 	if (nullptr != testing_label_temp) {
 		delete testing_label_temp;
 		testing_label_temp = nullptr;

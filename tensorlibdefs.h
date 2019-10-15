@@ -15,6 +15,7 @@
 #include <typeinfo>
 #include <iomanip>
 #include <chrono>
+#include <cmath>
 #include <assert.h>
 //#include <immintrin.h>
 
@@ -34,6 +35,12 @@
 #define INT32_T_SIGN(A) ((A > 0)? 1: ((A < 0)? -1: 0))
 
 #define FLOAT_SIGN(A) ((A > 0.0)? 1.0: ((A < 0.0)? -1.0: 0.0))
+
+#define IS_NAN(A) (std::isnan(A))
+
+#define IS_INF(A) (std::isinf(A))
+
+#define IS_FINITE(A) (std::isfinite(A))
 
 #define NEGATIVE(A) (-A)
 

@@ -30,8 +30,7 @@ LinearLayer::~LinearLayer() {
 
 
 Tensor LinearLayer::Forward(const Tensor& input_image) {
-	output_ = MM(w_, input_image);
-	return output_;
+	return MM(w_, input_image);
 }
 
 
@@ -42,8 +41,7 @@ Tensor LinearLayer::Backward(const Tensor& gradient) {
 	else {
 		dw_ += MM(gradient, Transpose(previous_layer_->GetOutput()));
 	}
-	grad_output_ = MM(Transpose(w_), gradient);
-	return grad_output_;
+	return MM(Transpose(w_), gradient);
 }
 
 

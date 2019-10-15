@@ -9,7 +9,7 @@ using namespace ftensor;
 using std::cerr;
 using std::endl;
 
-const float SOFTMAX_LIMIT = 80.0;
+const float SOFTMAX_LIMIT = 85.0;
 
 
 SoftmaxLayer::SoftmaxLayer(int dim)
