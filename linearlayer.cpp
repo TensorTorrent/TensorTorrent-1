@@ -43,8 +43,3 @@ Tensor LinearLayer::Backward(const Tensor& gradient) {
 	}
 	return MM(Transpose(w_), gradient);
 }
-
-
-void LinearLayer::ZeroGrad() {
-	dw_.Zeros();
-}

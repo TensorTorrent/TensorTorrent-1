@@ -31,6 +31,5 @@ Tensor MaxPool2dLayer::Forward(const Tensor& input) {
 
 
 Tensor MaxPool2dLayer::Backward(const Tensor& gradient) {
-	Tensor a;
-	return a;
+	return Mul(mask_, Kron(gradient, Ones(kernel_size_, kernel_size_, 1, 1)));
 }

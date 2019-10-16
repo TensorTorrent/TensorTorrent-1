@@ -8,7 +8,7 @@ using namespace std;
 
 
 const int kBatchSize = 50;
-const int kNumEpochs = 10;
+const int kNumEpochs = 1;
 
 
 int main() {
@@ -21,20 +21,24 @@ int main() {
 	testset.data() /= 255.0;
 	vector<Dataset> train_loader = DataLoader(trainset, kBatchSize, true);
 	vector<Dataset> test_loader = DataLoader(testset, kBatchSize, false);
-
+	
 	// Define layers
-	FlattenLayer f1;
-	LinearLayer l2(784, 400, false);
-	ReluLayer r3;
-	LinearLayer l4(400, 200, false);
+	Conv2dLayer c1(1, 6, 5, 1, 2, false);
+	ReluLayer r2;
+	MaxPool2dLayer m3;
+	Conv2dLayer c4(6, 16, 5, 1, 0, false);
 	ReluLayer r5;
-	LinearLayer l6(200, 100, false);
-	ReluLayer r7;
-	LinearLayer l8(100, 10, false);
-	SoftmaxLayer s9;
+	MaxPool2dLayer m6;
+	FlattenLayer f7;
+	LinearLayer l8(400, 120, false);
+	ReluLayer r9;
+	LinearLayer l10(120, 84, false);
+	ReluLayer r11;
+	LinearLayer l12(84, 10, false);
+	SoftmaxLayer s13;
 	
 	// Construct the model
-	Sequential net({&f1, &l2, &r3, &l4, &r5, &l6, &r7, &l8, &s9});
+	Sequential net({&c1, &r2, &m3, &c4, &r5, &m6, &f7, &l8, &r9, &l10, &r11, &l12, &s13});
 
 	// Optimizer and loss function
 	Adam optimizer(net);
@@ -62,7 +66,7 @@ int main() {
 				train_total += train_labels.Size(3);
 				auto correct = criterion.GetCorrect();
 				train_correct += correct.Item();
-				if (0 == batch_idx % 150) {
+				if (0 == batch_idx % 60) {
 					running_loss /= train_total;
 					float train_accuracy = 100.0 * train_correct / train_total;
 					cout << "[Train]  Epoch:" << i_epoch << "\t\t-\t\tLoss: " << fixed << setprecision(4) << running_loss << "\t\t-\t\tAccuracy: ";

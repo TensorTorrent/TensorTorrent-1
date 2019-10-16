@@ -19,8 +19,7 @@ public:
 
 	ftensor::Tensor Forward(const ftensor::Tensor& input_image);
 	ftensor::Tensor Backward(const ftensor::Tensor& gradient);
-	void ZeroGrad();
-
+	
 protected:
 	int in_features_;
 	int out_features_;

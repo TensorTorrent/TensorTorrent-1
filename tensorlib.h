@@ -3556,9 +3556,9 @@ inline TensorTemplate<TDAT> Conv2dTemplate(const TensorTemplate<TDAT>& a, const 
 			for (int g = 0; g < gros_ts; ++g) {
 				int g_base_ts = g * rows_ts * cols_ts * slis_ts;
 				int g_base_a = g * rows_a * cols_a * slis_a;
-				int g_base_k = g * rows_k * cols_k * slis_k;
 				for (int s = 0; s < slis_ts; ++s) {
 					int s_base_ts = s * rows_ts * cols_ts;
+					int g_base_k = s * rows_k * cols_k * slis_k;
 					for (int r = 0; r < rows_ts; ++r) {
 						for (int c = 0; c < cols_ts; ++c) {
 							TDAT temp = 0;
@@ -3655,9 +3655,9 @@ inline TensorTemplate<TDAT> ConvTranspose2dTemplate(const TensorTemplate<TDAT>& 
 			for (int g = 0; g < gros_ts; ++g) {
 				int g_base_ts = g * rows_ts * cols_ts * slis_ts;
 				int g_base_b = g * rows_b * cols_b * slis_b;
-				int g_base_k = g * rows_k * cols_k * slis_k;
 				for (int s = 0; s < slis_ts; ++s) {
 					int s_base_ts = s * rows_ts * cols_ts;
+					int g_base_k = s * rows_k * cols_k * slis_k;
 					for (int r = 0; r < rows_ts; ++r) {
 						for (int c = 0; c < cols_ts; ++c) {
 							TDAT temp = 0;

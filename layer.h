@@ -21,7 +21,7 @@ public:
 	virtual ftensor::Tensor Backward(const ftensor::Tensor& input) = 0;
 	void Forward();
 	void Backward();
-	virtual void ZeroGrad();
+	void ZeroGrad();
 
 	void SetAsFirstLayer() {is_first_layer_ = true; previous_layer_ = nullptr;}
 	void SetPreviousLayer(Layer* previous_layer) {previous_layer_ = previous_layer; is_first_layer_ = false;}

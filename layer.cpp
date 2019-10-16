@@ -41,6 +41,12 @@ void Layer::Backward() {
 
 
 void Layer::ZeroGrad() {
+	if (has_weight_) {
+		dw_.Zeros();
+	}
+	if (has_bias_) {
+		db_.Zeros();
+	}
 }
 
 

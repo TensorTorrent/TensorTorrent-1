@@ -17,10 +17,8 @@ public:
 	Conv2dLayer(int in_channels, int out_channels, int kernel_size, int stride = 1, int padding = 0, bool bias = true);
 	virtual ~Conv2dLayer();
 
-	ftensor::Tensor Forward(const ftensor::Tensor& input_image);
+	ftensor::Tensor Forward(const ftensor::Tensor& input);
 	ftensor::Tensor Backward(const ftensor::Tensor& gradient);
-	ftensor::Tensor GetWeight() const {return kernel_;}
-	void SetWeight(const ftensor::Tensor& kernel);
 
 protected:
 	int in_channels_;
@@ -29,9 +27,6 @@ protected:
 	int stride_;
 	int padding_;
 	float init_range_;
-	ftensor::Tensor kernel_;
-	bool using_bias_;
-	ftensor::Tensor bias_;
 };
 
 
