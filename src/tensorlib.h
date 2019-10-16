@@ -2295,6 +2295,259 @@ inline TensorTemplate<TDAT> StddevTemplate(const TensorTemplate<TDAT>& a, int di
 
 
 template <typename TDAT>
+inline TensorTemplate<TDAT> VarTemplate(const TensorTemplate<TDAT>& a, const std::string& ddof) {
+	TensorTemplate<TDAT> ts;
+	ts.Resize(1, 1, 1, 1);
+	ts.Zeros();
+	int numel_a = a.numel();
+	if (0 != numel_a) {
+		TDAT* data_ts = ts.data();
+		TDAT* data_a = a.data();
+		TDAT mean_value = 0;
+		TDAT variance = 0;
+		for (int n = 0; n < numel_a; ++n) {
+			mean_value += data_a[n];
+		}
+		mean_value /= numel_a;
+		for (int n = 0; n < numel_a; ++n) {
+			variance += ((data_a[n] - mean_value) * (data_a[n] - mean_value));
+		}
+		if ("0" == ddof || 1 == numel_a) {
+			data_ts[0] = (variance / numel_a);
+		}
+		else {
+			data_ts[0] = (variance / (numel_a - 1));
+		}
+	}
+	return ts;
+}
+
+
+template <typename TDAT>
+inline TensorTemplate<TDAT> VarTemplate(const TensorTemplate<TDAT>& a, int dim, const std::string& ddof) {
+	TensorTemplate<TDAT> ts;
+	TensorTemplate<TDAT> m;
+	int rows_a = a.rows();
+	int cols_a = a.cols();
+	int slis_a = a.slis();
+	int gros_a = a.gros();
+	int numel_a = a.numel();
+	if (0 == numel_a) {
+		switch (dim) {
+			case 0:
+			ts.Resize((0 == rows_a)? 0: 1, cols_a, slis_a, gros_a);
+			break;
+			case 1:
+			ts.Resize(rows_a, (0 == cols_a)? 0: 1, slis_a, gros_a);
+			break;
+			case 2:
+			ts.Resize(rows_a, cols_a, (0 == slis_a)? 0: 1, gros_a);
+			break;
+			case 3:
+			ts.Resize(rows_a, cols_a, slis_a, (0 == gros_a)? 0: 1);
+			break;
+			default:
+			#ifdef TENSOR_DEBUG
+			T_ERROR("Dimension should be 0, 1, 2, or 3.\n");
+			#else
+			ts.Resize(rows_a, cols_a, slis_a, gros_a);
+			#endif
+		}
+	}
+	if (0 != numel_a) {
+		TDAT* data_ts;
+		TDAT* data_a;
+		TDAT* data_m;
+		int numel_ts;
+		int num;
+		switch (dim) {
+			case 0:
+			m.Resize(1, cols_a, slis_a, gros_a);
+			m.Zeros();
+			data_m = m.data();
+			data_a = a.data();
+			for (int g = 0; g < gros_a; ++g) {
+				int g_base_m = g * 1 * cols_a * slis_a;
+				int g_base_a = g * rows_a * cols_a * slis_a;
+				for (int s = 0; s < slis_a; ++s) {
+					int s_base_m = s * 1 * cols_a;
+					int s_base_a = s * rows_a * cols_a;
+					for (int r = 0; r < rows_a; ++r) {
+						for (int c = 0; c < cols_a; ++c) {
+							data_m[g_base_m + s_base_m + 0 * cols_a + c] += data_a[g_base_a + s_base_a + r * cols_a + c];
+						}
+					}
+				}
+			}
+			m /= rows_a;
+			ts.Resize(1, cols_a, slis_a, gros_a);
+			ts.Zeros();
+			data_ts = ts.data();
+			for (int g = 0; g < gros_a; ++g) {
+				int g_base_ts = g * 1 * cols_a * slis_a;
+				int g_base_a = g * rows_a * cols_a * slis_a;
+				for (int s = 0; s < slis_a; ++s) {
+					int s_base_ts = s * 1 * cols_a;
+					int s_base_a = s * rows_a * cols_a;
+					for (int r = 0; r < rows_a; ++r) {
+						for (int c = 0; c < cols_a; ++c) {
+							TDAT variance = data_a[g_base_a + s_base_a + r * cols_a + c] - data_m[g_base_ts + s_base_ts + 0 * cols_a + c];
+							data_ts[g_base_ts + s_base_ts + 0 * cols_a + c] += variance * variance;
+						}
+					}
+				}
+			}
+			num = ("0" == ddof || 1 == rows_a)? rows_a: (rows_a - 1);
+			numel_ts = ts.numel();
+			for (int n = 0; n < numel_ts; ++n) {
+				data_ts[n] = (data_ts[n] / num);
+			}
+			break;
+			case 1:
+			m.Resize(rows_a, 1, slis_a, gros_a);
+			m.Zeros();
+			data_m = m.data();
+			data_a = a.data();
+			for (int g = 0; g < gros_a; ++g) {
+				int g_base_m = g * rows_a * 1 * slis_a;
+				int g_base_a = g * rows_a * cols_a * slis_a;
+				for (int s = 0; s < slis_a; ++s) {
+					int s_base_m = s * rows_a * 1;
+					int s_base_a = s * rows_a * cols_a;
+					for (int r = 0; r < rows_a; ++r) {
+						for (int c = 0; c < cols_a; ++c) {
+							data_m[g_base_m + s_base_m + r * 1 + 0] += data_a[g_base_a + s_base_a + r * cols_a + c];
+						}
+					}
+				}
+			}
+			m /= cols_a;
+			ts.Resize(rows_a, 1, slis_a, gros_a);
+			ts.Zeros();
+			data_ts = ts.data();
+			for (int g = 0; g < gros_a; ++g) {
+				int g_base_ts = g * rows_a * 1 * slis_a;
+				int g_base_a = g * rows_a * cols_a * slis_a;
+				for (int s = 0; s < slis_a; ++s) {
+					int s_base_ts = s * rows_a * 1;
+					int s_base_a = s * rows_a * cols_a;
+					for (int r = 0; r < rows_a; ++r) {
+						for (int c = 0; c < cols_a; ++c) {
+							TDAT variance = data_a[g_base_a + s_base_a + r * cols_a + c] - data_m[g_base_ts + s_base_ts + r * 1 + 0];
+							data_ts[g_base_ts + s_base_ts + r * 1 + 0] += variance * variance;
+						}
+					}
+				}
+			}
+			num = ("0" == ddof || 1 == cols_a)? cols_a: (cols_a - 1);
+			numel_ts = ts.numel();
+			for (int n = 0; n < numel_ts; ++n) {
+				data_ts[n] = (data_ts[n] / num);
+			}
+			break;
+			case 2:
+			m.Resize(rows_a, cols_a, 1, gros_a);
+			m.Zeros();
+			data_m = m.data();
+			data_a = a.data();
+			for (int g = 0; g < gros_a; ++g) {
+				int g_base_m = g * rows_a * cols_a * 1;
+				int g_base_a = g * rows_a * cols_a * slis_a;
+				for (int s = 0; s < slis_a; ++s) {
+					int s_base_m = 0;
+					int s_base_a = s * rows_a * cols_a;
+					for (int r = 0; r < rows_a; ++r) {
+						for (int c = 0; c < cols_a; ++c) {
+							data_m[g_base_m + s_base_m + r * cols_a + c] += data_a[g_base_a + s_base_a + r * cols_a + c];
+						}
+					}
+				}
+			}
+			m /= slis_a;
+			ts.Resize(rows_a, cols_a, 1, gros_a);
+			ts.Zeros();
+			data_ts = ts.data();
+			for (int g = 0; g < gros_a; ++g) {
+				int g_base_ts = g * rows_a * cols_a * 1;
+				int g_base_a = g * rows_a * cols_a * slis_a;
+				for (int s = 0; s < slis_a; ++s) {
+					int s_base_ts = 0;
+					int s_base_a = s * rows_a * cols_a;
+					for (int r = 0; r < rows_a; ++r) {
+						for (int c = 0; c < cols_a; ++c) {
+							TDAT variance = data_a[g_base_a + s_base_a + r * cols_a + c] - data_m[g_base_ts + s_base_ts + r * cols_a + c];
+							data_ts[g_base_ts + s_base_ts + r * cols_a + c] += variance * variance;
+						}
+					}
+				}
+			}
+			num = ("0" == ddof || 1 == slis_a)? slis_a: (slis_a - 1);
+			numel_ts = ts.numel();
+			for (int n = 0; n < numel_ts; ++n) {
+				data_ts[n] = (data_ts[n] / num);
+			}
+			break;
+			case 3:
+			m.Resize(rows_a, cols_a, slis_a, 1);
+			m.Zeros();
+			data_m = m.data();
+			data_a = a.data();
+			for (int g = 0; g < gros_a; ++g) {
+				int g_base_m = 0;
+				int g_base_a = g * rows_a * cols_a * slis_a;
+				for (int s = 0; s < slis_a; ++s) {
+					int s_base_m = s * rows_a * cols_a;
+					int s_base_a = s * rows_a * cols_a;
+					for (int r = 0; r < rows_a; ++r) {
+						for (int c = 0; c < cols_a; ++c) {
+							data_m[g_base_m + s_base_m + r * cols_a + c] += data_a[g_base_a + s_base_a + r * cols_a + c];
+						}
+					}
+				}
+			}
+			m /= gros_a;
+			ts.Resize(rows_a, cols_a, slis_a, 1);
+			ts.Zeros();
+			data_ts = ts.data();
+			for (int g = 0; g < gros_a; ++g) {
+				int g_base_ts = 0;
+				int g_base_a = g * rows_a * cols_a * slis_a;
+				for (int s = 0; s < slis_a; ++s) {
+					int s_base_ts = s * rows_a * cols_a;
+					int s_base_a = s * rows_a * cols_a;
+					for (int r = 0; r < rows_a; ++r) {
+						for (int c = 0; c < cols_a; ++c) {
+							TDAT variance = data_a[g_base_a + s_base_a + r * cols_a + c] - data_m[g_base_ts + s_base_ts + r * cols_a + c];
+							data_ts[g_base_ts + s_base_ts + r * cols_a + c] += variance * variance;
+						}
+					}
+				}
+			}
+			num = ("0" == ddof || 1 == gros_a)? gros_a: (gros_a - 1);
+			numel_ts = ts.numel();
+			for (int n = 0; n < numel_ts; ++n) {
+				data_ts[n] = (data_ts[n] / num);
+			}
+			break;
+			default:
+			#ifdef TENSOR_DEBUG
+			T_ERROR("Dimension should be 0, 1, 2, or 3.\n");
+			#else
+			ts.Resize(rows_a, cols_a, slis_a, gros_a);
+			ts.Zeros();
+			data_ts = ts.data();
+			data_a = a.data();
+			for (int n = 0; n < numel_a; ++n) {
+				data_ts[n] = data_a[n];
+			}
+			#endif
+		}
+	}
+	return ts;
+}
+
+
+template <typename TDAT>
 inline TensorTemplate<TDAT> MaxTemplate(const TensorTemplate<TDAT>& a) {
 	TensorTemplate<TDAT> ts;
 	ts.Resize(1, 1, 1, 1);
@@ -4002,6 +4255,8 @@ Tensor Mean(const Tensor& a);
 Tensor Mean(const Tensor& a, int dim);
 Tensor Stddev(const Tensor& a, const std::string& ddof = "0");
 Tensor Stddev(const Tensor& a, int dim, const std::string& ddof = "0");
+Tensor Var(const Tensor& a, const std::string& ddof = "0");
+Tensor Var(const Tensor& a, int dim, const std::string& ddof = "0");
 Tensor Max(const Tensor& a);
 Tensor Max(const Tensor& a, int dim, Tensor* pos = nullptr);
 Tensor Min(const Tensor& a);
@@ -4143,6 +4398,8 @@ Tensor Mean(const Tensor& a);
 Tensor Mean(const Tensor& a, int dim);
 Tensor Stddev(const Tensor& a, const std::string& ddof = "0");
 Tensor Stddev(const Tensor& a, int dim, const std::string& ddof = "0");
+Tensor Var(const Tensor& a, const std::string& ddof = "0");
+Tensor Var(const Tensor& a, int dim, const std::string& ddof = "0");
 Tensor Max(const Tensor& a);
 Tensor Max(const Tensor& a, int dim, Tensor* pos = nullptr);
 Tensor Min(const Tensor& a);

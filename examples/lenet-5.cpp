@@ -8,7 +8,7 @@ using namespace std;
 
 
 const int kBatchSize = 100;
-const int kNumEpochs = 20;
+const int kNumEpochs = 1;
 
 
 int main() {
@@ -31,14 +31,17 @@ int main() {
 	MaxPool2dLayer m6;
 	FlattenLayer f7;
 	LinearLayer l8(400, 120, false);
-	ReluLayer r9;
-	LinearLayer l10(120, 84, false);
-	ReluLayer r11;
-	LinearLayer l12(84, 10, false);
-	SoftmaxLayer s13;
+	BatchNorm1dLayer b9(120, 1.0e-5);
+	ReluLayer r10;
+	LinearLayer l11(120, 84, false);
+	BatchNorm1dLayer b12(84, 1.0e-5);
+	ReluLayer r13;
+	LinearLayer l14(84, 10, false);
+	BatchNorm1dLayer b15(10, 1.0e-5);
+	SoftmaxLayer s16;
 	
 	// Construct the model
-	Sequential net({&c1, &r2, &m3, &c4, &r5, &m6, &f7, &l8, &r9, &l10, &r11, &l12, &s13});
+	Sequential net({&c1, &r2, &m3, &c4, &r5, &m6, &f7, &l8, &b9, &r10, &l11, &b12, &r13, &l14, &b15, &s16});
 
 	// Optimizer and loss function
 	Adam optimizer(net);

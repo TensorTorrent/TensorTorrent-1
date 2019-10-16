@@ -18,6 +18,8 @@
 #include "softmaxlayer.h"
 #include "linearlayer.h"
 #include "maxpool2dlayer.h"
+#include "batchnorm1dlayer.h"
+#include "identitylayer.h"
 #include "sequential.h"
 #include "optimizer.h"
 #include "adam.h"

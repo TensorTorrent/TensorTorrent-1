@@ -675,6 +675,16 @@ Tensor Stddev(const Tensor& a, int dim, const std::string& ddof) {
 }
 
 
+Tensor Var(const Tensor& a, const std::string& ddof) {
+	return VarTemplate<int32_t>(a, ddof);
+}
+
+
+Tensor Var(const Tensor& a, int dim, const std::string& ddof) {
+	return VarTemplate<int32_t>(a, dim, ddof);
+}
+
+
 Tensor Max(const Tensor& a) {
 	return MaxTemplate<int32_t>(a);
 }
@@ -1290,6 +1300,16 @@ Tensor Stddev(const Tensor& a, const std::string& ddof) {
 
 Tensor Stddev(const Tensor& a, int dim, const std::string& ddof) {
 	return StddevTemplate<float>(a, dim, ddof);
+}
+
+
+Tensor Var(const Tensor& a, const std::string& ddof) {
+	return VarTemplate<float>(a, ddof);
+}
+
+
+Tensor Var(const Tensor& a, int dim, const std::string& ddof) {
+	return VarTemplate<float>(a, dim, ddof);
 }
 
 
