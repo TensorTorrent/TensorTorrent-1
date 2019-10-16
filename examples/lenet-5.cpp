@@ -24,24 +24,26 @@ int main() {
 	
 	// Define layers
 	Conv2dLayer c1(1, 6, 5, 1, 2, false);
-	ReluLayer r2;
-	MaxPool2dLayer m3;
-	Conv2dLayer c4(6, 16, 5, 1, 0, false);
-	ReluLayer r5;
-	MaxPool2dLayer m6;
-	FlattenLayer f7;
-	LinearLayer l8(400, 120, false);
-	BatchNorm1dLayer b9(120, 1.0e-5);
-	ReluLayer r10;
-	LinearLayer l11(120, 84, false);
-	BatchNorm1dLayer b12(84, 1.0e-5);
-	ReluLayer r13;
-	LinearLayer l14(84, 10, false);
-	BatchNorm1dLayer b15(10, 1.0e-5);
-	SoftmaxLayer s16;
+	BatchNorm2dLayer b2(6);
+	ReluLayer r3;
+	MaxPool2dLayer m4;
+	Conv2dLayer c5(6, 16, 5, 1, 0, false);
+	BatchNorm2dLayer b6(16);
+	ReluLayer r7;
+	MaxPool2dLayer m8;
+	FlattenLayer f9;
+	LinearLayer l10(400, 120, false);
+	BatchNorm1dLayer b11(120);
+	ReluLayer r12;
+	LinearLayer l13(120, 84, false);
+	BatchNorm1dLayer b14(84);
+	ReluLayer r15;
+	LinearLayer l16(84, 10, false);
+	BatchNorm1dLayer b17(10);
+	SoftmaxLayer s18;
 	
 	// Construct the model
-	Sequential net({&c1, &r2, &m3, &c4, &r5, &m6, &f7, &l8, &b9, &r10, &l11, &b12, &r13, &l14, &b15, &s16});
+	Sequential net({&c1, &b2, &r3, &m4, &c5, &b6, &r7, &m8, &f9, &l10, &b11, &r12, &l13, &b14, &r15, &l16, &b17, &s18});
 
 	// Optimizer and loss function
 	Adam optimizer(net);

@@ -856,6 +856,12 @@ DEFINE_FUNC_T_T(operator+, ADD_OPERATION, int32_t);
 DEFINE_FUNC_T_S(operator-, MINUS_OPERATION, int32_t);
 DEFINE_FUNC_S_T(operator-, MINUS_OPERATION, int32_t);
 DEFINE_FUNC_T_T(operator-, MINUS_OPERATION, int32_t);
+DEFINE_FUNC_T_S(Plus, ADD_OPERATION, int32_t);
+DEFINE_FUNC_S_T(Plus, ADD_OPERATION, int32_t);
+DEFINE_FUNC_T_T(Plus, ADD_OPERATION, int32_t);
+DEFINE_FUNC_T_S(Minus, MINUS_OPERATION, int32_t);
+DEFINE_FUNC_S_T(Minus, MINUS_OPERATION, int32_t);
+DEFINE_FUNC_T_T(Minus, MINUS_OPERATION, int32_t);
 
 
 Tensor operator*(const Tensor& ts, const int32_t& num) {
@@ -1484,6 +1490,12 @@ DEFINE_FUNC_T_T(operator+, ADD_OPERATION, float);
 DEFINE_FUNC_T_S(operator-, MINUS_OPERATION, float);
 DEFINE_FUNC_S_T(operator-, MINUS_OPERATION, float);
 DEFINE_FUNC_T_T(operator-, MINUS_OPERATION, float);
+DEFINE_FUNC_T_S(Plus, ADD_OPERATION, float);
+DEFINE_FUNC_S_T(Plus, ADD_OPERATION, float);
+DEFINE_FUNC_T_T(Plus, ADD_OPERATION, float);
+DEFINE_FUNC_T_S(Minus, MINUS_OPERATION, float);
+DEFINE_FUNC_S_T(Minus, MINUS_OPERATION, float);
+DEFINE_FUNC_T_T(Minus, MINUS_OPERATION, float);
 
 
 Tensor operator*(const Tensor& ts, const float& num) {
