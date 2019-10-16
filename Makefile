@@ -1,9 +1,20 @@
-TARGET = main
+TARGET = ${EX_DIR}/lenet-5
 
 MAIN_DIR = .
 DRIVER_DIR = ${MAIN_DIR}/drivers
+SRC_DIR = ${MAIN_DIR}/src
+EX_DIR = ${MAIN_DIR}/examples
 INC_DIR= -I${MAIN_DIR} \
+	-I${SRC_DIR} \
 	-I${DRIVER_DIR}
+
+
+src1 = $(wildcard ${SRC_DIR}/*.cpp)
+src2 = $(wildcard ${EX_DIR}/*.cpp)
+obj1 = $(patsubst %.cpp, %.o, $(src1))
+obj2 = $(patsubst %.cpp, %.o, $(src2))
+obj3 = drivers/jyn_spi.co drivers/jyn_gpio.o drivers/jyn_flash.o
+
 
 CFLAGS = -g -Wall -std=c++11 -O1 ${INC_DIR}
 LDFLAGS = -g -Wall -std=c++11 -O1
@@ -15,24 +26,26 @@ CC = gcc
 
 build: $(TARGET)
 
-$(TARGET): main.o tensorlib.o device.o layer.o conv2dlayer.o convtranspose2dlayer.o dataset.o mnistloader.o dataloader.o \
-	flattenlayer.o relulayer.o softmaxlayer.o linearlayer.o maxpool2dlayer.o sequential.o optimizer.o adam.o loss.o crossentropyloss.o
-# goku.o conv2dgoku.o convtranspose2dgoku.o drivers/jyn_spi.co drivers/jyn_gpio.o drivers/jyn_flash.o
+$(TARGET): $(obj1) $(obj2) ${obj3}
 	 ${CPP} $(LDFLAGS) $^ -o $@ 
 
 %.o : %.cpp
 	$(CPP) $(CFLAGS) -c $< -o $@
+%.o:$(SRC_DIR)/%.cpp
+	$(CPP) $(CFLAGS) -c $< -o $@
+%.o:$(EX_DIR)/%.cpp
+	$(CPP) $(CFLAGS) -c $< -o $@
 
-#drivers/jyn_spi.co : drivers/jyn_spi.c drivers/jyn_spi.h
-#	$(CC) $(CLDFLAGS) -c $< -o $@
-#drivers/jyn_gpio.o : drivers/jyn_gpio.cpp drivers/jyn_gpio.h
-#	$(CPP) -g -std=c++11 -O1 -c $< -o $@
-#drivers/jyn_flash.o : drivers/jyn_flash.cpp drivers/jyn_flash.h drivers/jyn_spi.h drivers/jyn_spi.co
-#	$(CPP) $(CFLAGS) -c $< -o $@
+drivers/jyn_spi.co : drivers/jyn_spi.c drivers/jyn_spi.h
+	$(CC) $(CLDFLAGS) -c $< -o $@
+drivers/jyn_gpio.o : drivers/jyn_gpio.cpp drivers/jyn_gpio.h
+	$(CPP) -g -std=c++11 -O1 -c $< -o $@
+drivers/jyn_flash.o : drivers/jyn_flash.cpp drivers/jyn_flash.h drivers/jyn_spi.h drivers/jyn_spi.co
+	$(CPP) $(CFLAGS) -c $< -o $@
 
 edit : $(TARGET)
 	cc -o edit $(TARGET)
 
 .PHONY: clean
 clean:
-	rm -f $(TARGET) ${MAIN_DIR}/*.o ${DRIVER_DIR}/*.co ${DRIVER_DIR}/*.o
+	rm -f $(TARGET) ${MAIN_DIR}/*.o ${SRC_DIR}/*.o ${EX_DIR}/*.o ${DRIVER_DIR}/*.co ${DRIVER_DIR}/*.o
