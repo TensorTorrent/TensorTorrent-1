@@ -40,14 +40,14 @@ int main() {
 	LeakyReluLayer r15;
 	LinearLayer l16(84, 10, false);
 	BatchNorm1dLayer b17(10);
-	SoftmaxLayer s18;
+	SigmoidLayer s18;
 	
 	// Construct the model
 	Sequential net({&c1, &b2, &r3, &m4, &c5, &b6, &r7, &m8, &f9, &l10, &b11, &r12, &l13, &b14, &r15, &l16, &b17, &s18});
 
 	// Optimizer and loss function
 	Adam optimizer(net);
-	CrossEntropyLoss criterion;
+	MSELoss criterion;
 
 	for (int i_epoch = 0; i_epoch < kNumEpochs + 1; ++i_epoch) {
 		start = clock();

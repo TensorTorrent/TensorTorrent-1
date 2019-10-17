@@ -29,6 +29,7 @@
 #include "adam.h"
 #include "loss.h"
 #include "crossentropyloss.h"
+#include "mseloss.h"
 #include "dataset.h"
 #include "mnistloader.h"
 #include "dataloader.h"
