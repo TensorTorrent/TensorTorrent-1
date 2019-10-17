@@ -23,31 +23,31 @@ int main() {
 	vector<Dataset> test_loader = DataLoader(testset, kBatchSize, false);
 	
 	// Define layers
-	Conv2dLayer c1(1, 6, 5, 1, 2, false);
+	Conv2dLayer c1(1, 6, 5, 1, 2, true);
 	BatchNorm2dLayer b2(6);
 	LeakyReluLayer r3;
 	MaxPool2dLayer m4;
-	Conv2dLayer c5(6, 16, 5, 1, 0, false);
+	Conv2dLayer c5(6, 16, 5, 1, 0, true);
 	BatchNorm2dLayer b6(16);
 	LeakyReluLayer r7;
 	MaxPool2dLayer m8;
 	FlattenLayer f9;
-	LinearLayer l10(400, 120, false);
+	LinearLayer l10(400, 120, true);
 	BatchNorm1dLayer b11(120);
 	LeakyReluLayer r12;
-	LinearLayer l13(120, 84, false);
+	LinearLayer l13(120, 84, true);
 	BatchNorm1dLayer b14(84);
 	LeakyReluLayer r15;
-	LinearLayer l16(84, 10, false);
+	LinearLayer l16(84, 10, true);
 	BatchNorm1dLayer b17(10);
-	SigmoidLayer s18;
+	SoftmaxLayer s18;
 	
 	// Construct the model
 	Sequential net({&c1, &b2, &r3, &m4, &c5, &b6, &r7, &m8, &f9, &l10, &b11, &r12, &l13, &b14, &r15, &l16, &b17, &s18});
 
 	// Optimizer and loss function
 	Adam optimizer(net);
-	MSELoss criterion;
+	CrossEntropyLoss criterion;
 
 	for (int i_epoch = 0; i_epoch < kNumEpochs + 1; ++i_epoch) {
 		start = clock();

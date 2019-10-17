@@ -23,7 +23,8 @@ Conv2dLayer::Conv2dLayer(int in_channels, int out_channels, int kernel_size, int
 	dw_ = Zeros(w_);
 	has_bias_ = bias;
 	if (has_bias_) {
-		b_ = Rand(1, 1, 1, 1, init_range_, -init_range_);
+		b_ = Rand(1, 1, out_channels_, 1, init_range_, -init_range_);
+		db_ = Zeros(b_);
 	}
 }
 
@@ -33,13 +34,24 @@ Conv2dLayer::~Conv2dLayer() {
 
 
 Tensor Conv2dLayer::Forward(const Tensor& input) {
-	return Conv2d(input, w_, stride_, padding_);
+	if (has_bias_) {
+		Tensor temp = Conv2d(input, w_, stride_, padding_);
+		return temp + Repmat(b_, temp.rows(), temp.cols(), 1, temp.gros());
+	}
+	else {
+		return Conv2d(input, w_, stride_, padding_);
+	}
 }
 
 
 Tensor Conv2dLayer::Backward(const Tensor& gradient) {
-	auto grad = gradient;
 	Tensor in;
+	auto grad = gradient;
+	if (has_bias_) {
+		for (int i_kernel = 0; i_kernel < out_channels_; ++i_kernel) {
+			db_(0, 0, i_kernel, 0) += Sum(grad.S(-1, -1, -1, -1, i_kernel, i_kernel + 1, -1, -1)).Item();
+		}
+	}
 	for (int i_kernel = 0; i_kernel < out_channels_; ++i_kernel) {
 		for (int i_channel = 0; i_channel < in_channels_; ++i_channel) {
 			if (is_first_layer_) {

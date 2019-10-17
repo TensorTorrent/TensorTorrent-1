@@ -31,5 +31,33 @@ Tensor MaxPool2dLayer::Forward(const Tensor& input) {
 
 
 Tensor MaxPool2dLayer::Backward(const Tensor& gradient) {
-	return Mul(mask_, Kron(gradient, Ones(kernel_size_, kernel_size_, 1, 1)));
+	Tensor temp = Kron(gradient, Ones(kernel_size_, kernel_size_, 1, 1));
+	if (is_first_layer_) {
+		if (Match(temp, input_)) {
+			return Mul(mask_, temp);
+		}
+		else {
+			int rows_o = temp.rows();
+			int cols_o = temp.cols();
+			int slis_o = temp.slis();
+			int gros_o = temp.gros();
+			Tensor output_temp = Zeros(input_);
+			output_temp.S(temp, 0, rows_o, 0, cols_o, 0, slis_o, 0, gros_o);
+			return Mul(mask_, output_temp);
+		}
+	}
+	else {
+		if (Match(temp, previous_layer_->GetOutput())) {
+			return Mul(mask_, temp);
+		}
+		else {
+			int rows_o = temp.rows();
+			int cols_o = temp.cols();
+			int slis_o = temp.slis();
+			int gros_o = temp.gros();
+			Tensor output_temp = Zeros(previous_layer_->GetOutput());
+			output_temp.S(temp, 0, rows_o, 0, cols_o, 0, slis_o, 0, gros_o);
+			return Mul(mask_, output_temp);
+		}
+	}
 }

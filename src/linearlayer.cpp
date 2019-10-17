@@ -20,7 +20,8 @@ LinearLayer::LinearLayer(int in_features, int out_features, bool bias)
 	has_weight_ = true;
 	has_bias_ = bias;
 	if (has_bias_) {
-		b_ = Rand(1, 1, 1, 1, init_range_, -init_range_);
+		b_ = Rand(out_features_, 1, 1, 1, init_range_, -init_range_);
+		db_ = Zeros(b_);
 	}
 }
 
@@ -30,7 +31,13 @@ LinearLayer::~LinearLayer() {
 
 
 Tensor LinearLayer::Forward(const Tensor& input_image) {
-	return MM(w_, input_image);
+	if (has_bias_) {
+		int batch_size = input_image.cols();
+		return MM(w_, input_image) + Repmat(b_, 1, batch_size, 1, 1);
+	}
+	else {
+		return MM(w_, input_image);
+	}
 }
 
 
@@ -40,6 +47,9 @@ Tensor LinearLayer::Backward(const Tensor& gradient) {
 	}
 	else {
 		dw_ += MM(gradient, Transpose(previous_layer_->GetOutput()));
+	}
+	if (has_bias_) {
+		db_ += Sum(gradient, 1);
 	}
 	return MM(Transpose(w_), gradient);
 }
