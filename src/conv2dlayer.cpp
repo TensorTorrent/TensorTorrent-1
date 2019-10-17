@@ -53,5 +53,33 @@ Tensor Conv2dLayer::Backward(const Tensor& gradient) {
 		}
 	}
 	auto back_kernel = Permute(w_, 0, 1, 3, 2);
-	return ConvTranspose2d(grad, back_kernel, stride_, padding_);
+	auto output_temp = ConvTranspose2d(grad, back_kernel, stride_, padding_);
+	if (is_first_layer_) {
+		if (Match(output_temp, input_)) {
+			return output_temp;
+		}
+		else {
+			auto output_temp2 = Zeros(input_);
+			int rows_o = output_temp.rows();
+			int cols_o = output_temp.cols();
+			int slis_o = output_temp.slis();
+			int gros_o = output_temp.gros();
+			output_temp2.S(output_temp, 0, rows_o, 0, cols_o, 0, slis_o, 0, gros_o);
+			return output_temp2;
+		}
+	}
+	else {
+		if (Match(output_temp, previous_layer_->GetOutput())) {
+			return output_temp;
+		}
+		else {
+			auto output_temp2 = Zeros(previous_layer_->GetOutput());
+			int rows_o = output_temp.rows();
+			int cols_o = output_temp.cols();
+			int slis_o = output_temp.slis();
+			int gros_o = output_temp.gros();
+			output_temp2.S(output_temp, 0, rows_o, 0, cols_o, 0, slis_o, 0, gros_o);
+			return output_temp2;
+		}
+	}
 }

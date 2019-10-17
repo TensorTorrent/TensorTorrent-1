@@ -1,6 +1,6 @@
 // Author: Yuning Jiang
 // Date: Oct. 11 th, 2019
-// Description: Flatten layer.
+// Description: ReLU layer.
 
 #include "relulayer.h"
 

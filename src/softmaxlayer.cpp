@@ -9,7 +9,7 @@ using namespace ftensor;
 using std::cerr;
 using std::endl;
 
-const float SOFTMAX_LIMIT = 85.0;
+const float EXP_LIMIT = 85.0;
 
 
 SoftmaxLayer::SoftmaxLayer(int dim)
@@ -29,7 +29,7 @@ SoftmaxLayer::~SoftmaxLayer() {
 
 
 Tensor SoftmaxLayer::Forward(const Tensor& input) {
-	Tensor temp = Exp(Where(input > SOFTMAX_LIMIT, input, input));
+	Tensor temp = Exp(Where(input > EXP_LIMIT, input, input));
 	Tensor sum = Sum(temp, dim_);
 	switch (dim_) {
 		case 0:

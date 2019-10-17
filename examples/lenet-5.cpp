@@ -25,19 +25,19 @@ int main() {
 	// Define layers
 	Conv2dLayer c1(1, 6, 5, 1, 2, false);
 	BatchNorm2dLayer b2(6);
-	ReluLayer r3;
+	LeakyReluLayer r3;
 	MaxPool2dLayer m4;
 	Conv2dLayer c5(6, 16, 5, 1, 0, false);
 	BatchNorm2dLayer b6(16);
-	ReluLayer r7;
+	LeakyReluLayer r7;
 	MaxPool2dLayer m8;
 	FlattenLayer f9;
 	LinearLayer l10(400, 120, false);
 	BatchNorm1dLayer b11(120);
-	ReluLayer r12;
+	LeakyReluLayer r12;
 	LinearLayer l13(120, 84, false);
 	BatchNorm1dLayer b14(84);
-	ReluLayer r15;
+	LeakyReluLayer r15;
 	LinearLayer l16(84, 10, false);
 	BatchNorm1dLayer b17(10);
 	SoftmaxLayer s18;
