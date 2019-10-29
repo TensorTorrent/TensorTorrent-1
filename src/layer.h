@@ -41,11 +41,15 @@ public:
 	const ftensor::Tensor& GetWeight() {return w_;}
 	void SetBias(const ftensor::Tensor& b);
 	const ftensor::Tensor& GetBias() {return b_;}
-	
+
+	void Train(bool mode = true) {training_mode_ = mode;}
+	void Eval() {training_mode_ = false;}
+
 protected:
 	bool is_first_layer_;
 	bool has_weight_;
 	bool has_bias_;
+	bool training_mode_;
 	Layer* previous_layer_;
 	ftensor::Tensor input_;
 	ftensor::Tensor output_;

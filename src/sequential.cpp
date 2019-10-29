@@ -44,3 +44,17 @@ Tensor Sequential::Backward(const Tensor& gradient) {
 	}
 	return layers_[0]->GetGradOutput();
 }
+
+
+void Sequential::Train(bool mode) {
+	for (int i_layer = 0; i_layer < n_layers_; ++i_layer) {
+		layers_[i_layer]->Train(mode);
+	}
+}
+
+
+void Sequential::Eval() {
+	for (int i_layer = 0; i_layer < n_layers_; ++i_layer) {
+		layers_[i_layer]->Eval();
+	}
+}

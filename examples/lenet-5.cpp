@@ -20,7 +20,7 @@ int main() {
 	trainset.data() /= 255.0;
 	testset.data() /= 255.0;
 	vector<Dataset> train_loader = DataLoader(trainset, kBatchSize, true);
-	vector<Dataset> test_loader = DataLoader(testset, kBatchSize, false);
+	vector<Dataset> test_loader = DataLoader(testset, 1, false);
 	
 	// Define layers
 	Conv2dLayer c1(1, 6, 5, 1, 2, true);
@@ -54,6 +54,7 @@ int main() {
 
 		if (0 != i_epoch) {
 			// Train
+			net.Train();
 			float running_loss = 0.0;
 			int train_correct = 0;
 			int train_total = 0;
@@ -84,6 +85,7 @@ int main() {
 		}
 
 		// Test
+		net.Eval();
 		float test_loss = 0.0;
 		int test_correct = 0;
 		int test_total = 0;

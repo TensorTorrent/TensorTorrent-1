@@ -8,10 +8,11 @@
 using namespace ftensor;
 
 
-BatchNorm1dLayer::BatchNorm1dLayer(int num_features, float eps)
+BatchNorm1dLayer::BatchNorm1dLayer(int num_features, float eps, float momentum)
 : Layer() {
 	num_features_ = num_features;
 	eps_ = eps;
+	momentum_ = momentum;
 	batch_size_ = 1;
 	has_weight_ = true;
 	has_bias_ = true;
@@ -21,6 +22,8 @@ BatchNorm1dLayer::BatchNorm1dLayer(int num_features, float eps)
 	db_ = Zeros(num_features_, 1);
 	e_input_ = Zeros(num_features_, 1);
 	var_input_ = Zeros(num_features_, 1);
+	h_e_input_ = Zeros(num_features_, 1);
+	h_var_input_ = Ones(num_features_, 1);
 }
 
 
@@ -31,8 +34,16 @@ BatchNorm1dLayer::~BatchNorm1dLayer() {
 Tensor BatchNorm1dLayer::Forward(const Tensor& input) {
 	xi_ = input;
 	batch_size_ = input.cols();
-	e_input_ = Mean(input, 1);
-	var_input_ = Var(input, 1, "0");
+	if (training_mode_) {
+		e_input_ = Mean(input, 1);
+		var_input_ = Var(input, 1, "0");
+		h_e_input_ = (1.0 - momentum_) * h_e_input_ + momentum_ * e_input_;
+		h_var_input_ = (1.0 - momentum_) * h_var_input_ + momentum_ * var_input_;
+	}
+	else {
+		e_input_ = h_e_input_;
+		var_input_ = h_var_input_;
+	}
 	r_e_input_ = Repmat(e_input_, 1, batch_size_, 1, 1);
 	r_var_input_ = Repmat(var_input_, 1, batch_size_, 1, 1);
 	r_w_ = Repmat(w_, 1, batch_size_, 1, 1);

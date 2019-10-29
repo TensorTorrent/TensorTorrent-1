@@ -15,6 +15,7 @@ Layer::Layer() {
 	previous_layer_ = nullptr;
 	has_weight_ = false;
 	has_bias_ = false;
+	training_mode_ = false;
 }
 
 

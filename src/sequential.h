@@ -32,6 +32,9 @@ public:
 	const std::vector<Layer*> GetLayers() {return layers_;}
 	int GetLayerNum() {return n_layers_;}
 
+	void Train(bool mode = true);
+	void Eval();
+
 private:
 	std::vector<Layer*> layers_;
 	int n_layers_;
