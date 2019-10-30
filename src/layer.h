@@ -7,8 +7,13 @@
 
 
 #include <iostream>
+#include <fstream>
 
 #include "tensorlib.h"
+
+#define END_OF_LAYER 0x4BC27A50
+#define END_OF_CONTAINER 0x1C82F074
+#define END_OF_MODEL 0x7823E1D6
 
 
 class Layer {
@@ -45,7 +50,11 @@ public:
 	void Train(bool mode = true) {training_mode_ = mode;}
 	void Eval() {training_mode_ = false;}
 
+	virtual void ExportTo(std::ofstream& output_file);
+	virtual void ImportFrom(std::ifstream& input_file);
+
 protected:
+	int32_t layer_type_id_;
 	bool is_first_layer_;
 	bool has_weight_;
 	bool has_bias_;

@@ -10,6 +10,7 @@ using namespace ftensor;
 
 ReluLayer::ReluLayer()
 : Layer() {
+	layer_type_id_ = 3;
 }
 
 

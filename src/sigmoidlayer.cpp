@@ -13,6 +13,7 @@ const float EXP_LIMIT = 85.0;
 
 SigmoidLayer::SigmoidLayer()
 : Layer() {
+	layer_type_id_ = 10;
 }
 
 

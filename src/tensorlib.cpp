@@ -765,12 +765,22 @@ Tensor ConvTranspose2d(const Tensor& a, const Tensor& k, int stride, int padding
 }
 
 
-void SaveTensor(string file_name, const Tensor& ts) {
+void WriteTensor(std::ofstream& output_file, Tensor* ts) {
+	WriteTensorTemplate<int32_t>(output_file, ts);
+}
+
+
+void ReadTensor(std::ifstream& input_file, Tensor* ts) {
+	ReadTensorTemplate<int32_t>(input_file, ts);
+}
+
+
+void SaveTensor(string file_name, Tensor* ts) {
 	SaveTensorTemplate<int32_t>(file_name, ts);
 }
 
 
-void SaveTensors(string file_name, const vector<Tensor>& tensor_group) {
+void SaveTensors(string file_name, vector<Tensor>* tensor_group) {
 	SaveTensorsTemplate<int32_t>(file_name, tensor_group);
 }
 
@@ -1399,12 +1409,22 @@ Tensor ConvTranspose2d(const Tensor& a, const Tensor& k, int stride, int padding
 }
 
 
-void SaveTensor(string file_name, const Tensor& ts) {
+void WriteTensor(std::ofstream& output_file, Tensor* ts) {
+	WriteTensorTemplate<float>(output_file, ts);
+}
+
+
+void ReadTensor(std::ifstream& input_file, Tensor* ts) {
+	ReadTensorTemplate<float>(input_file, ts);
+}
+
+
+void SaveTensor(string file_name, Tensor* ts) {
 	SaveTensorTemplate<float>(file_name, ts);
 }
 
 
-void SaveTensors(string file_name, const vector<Tensor>& tensor_group) {
+void SaveTensors(string file_name, vector<Tensor>* tensor_group) {
 	SaveTensorsTemplate<float>(file_name, tensor_group);
 }
 

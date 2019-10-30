@@ -11,13 +11,13 @@
 
 #include "tensorlib.h"
 #include "layer.h"
-#include "sequential.h"
+#include "model.h"
 #include "optimizer.h"
 
 
 class Adam : public Optimizer {
 public:
-	Adam(Sequential& model, float lr = 0.001, float beta1 = 0.9, float beta2 = 0.999, float eps = 1e-08);
+	Adam(Model& model, float lr = 0.001, float beta1 = 0.9, float beta2 = 0.999, float eps = 1e-08);
 	virtual ~Adam();
 	void Step();
 

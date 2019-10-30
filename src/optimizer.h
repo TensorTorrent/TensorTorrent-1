@@ -10,12 +10,12 @@
 
 #include "tensorlib.h"
 #include "layer.h"
-#include "sequential.h"
+#include "model.h"
 
 
 class Optimizer {
 public:
-	Optimizer(Sequential& model);
+	Optimizer(Model& model);
 	virtual ~Optimizer();
 	void ZeroGrad();
 	virtual void Step() = 0;

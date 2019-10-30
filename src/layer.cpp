@@ -11,6 +11,7 @@ using std::endl;
 
 
 Layer::Layer() {
+	layer_type_id_ = 0;
 	is_first_layer_ = true;
 	previous_layer_ = nullptr;
 	has_weight_ = false;
@@ -80,6 +81,23 @@ void Layer::SetBias(const ftensor::Tensor& b) {
 	}
 	else {
 		cerr << "Error: The layer has no bias." << endl;
+		exit(1);
+	}
+}
+
+
+void Layer::ExportTo(std::ofstream& output_file) {
+	int32_t end_of_layer = END_OF_LAYER;
+	output_file.write((char*)&layer_type_id_, sizeof(int32_t));
+	output_file.write((char*)&end_of_layer, sizeof(int32_t));
+}
+
+
+void Layer::ImportFrom(std::ifstream& input_file) {
+	int32_t end_of_layer = 0;
+	input_file.read((char *)&end_of_layer, sizeof(int32_t));
+	if (END_OF_LAYER != end_of_layer) {
+		cerr << "Error: Invalid model format." << endl;
 		exit(1);
 	}
 }

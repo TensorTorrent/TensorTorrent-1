@@ -13,6 +13,7 @@ const float EXP_LIMIT = 85.0;
 
 TanhLayer::TanhLayer()
 : Layer() {
+	layer_type_id_ = 9;
 }
 
 

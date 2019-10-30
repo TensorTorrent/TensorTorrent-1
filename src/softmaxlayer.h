@@ -20,6 +20,9 @@ public:
 	ftensor::Tensor Forward(const ftensor::Tensor& input);
 	ftensor::Tensor Backward(const ftensor::Tensor& gradient);
 
+	void ExportTo(std::ofstream& output_file);
+	void ImportFrom(std::ifstream& input_file);
+
 protected:
 	int dim_;
 };

@@ -3939,33 +3939,21 @@ inline TensorTemplate<TDAT> ConvTranspose2dTemplate(const TensorTemplate<TDAT>& 
 
 
 template <typename TDAT>
-void SaveTensorTemplate(std::string file_name, const TensorTemplate<TDAT>& ts) {
-	std::ofstream output_file(file_name, std::ios::out | std::ios::binary);
-	if(!output_file) {
-		#ifdef TENSOR_DEBUG
-		T_ERROR("File creation failed.\n");
-		#endif
-	}
-	else {
-		int32_t cell_type = 0;
-		int32_t cell_x = 1;
-		int32_t cell_y = 1;
-		output_file.write((char*)&cell_type, sizeof(int32_t));
-		output_file.write((char*)&cell_x, sizeof(int32_t));
-		output_file.write((char*)&cell_y, sizeof(int32_t));
-		if (typeid(float).name() == typeid(TDAT).name()) {
-			int32_t type_id = -2;
-			output_file.write((char*)&type_id, sizeof(int32_t));
-			int32_t rows_ts = ts.rows();
-			int32_t cols_ts = ts.cols();
-			int32_t slis_ts = ts.slis();
-			int32_t gros_ts = ts.gros();
-			int numel_ts = ts.numel();
-			TDAT* data_ts = ts.data();
-			output_file.write((char*)&rows_ts, sizeof(int32_t));
-			output_file.write((char*)&cols_ts, sizeof(int32_t));
-			output_file.write((char*)&slis_ts, sizeof(int32_t));
-			output_file.write((char*)&gros_ts, sizeof(int32_t));
+void WriteTensorTemplate(std::ofstream& output_file, TensorTemplate<TDAT>* ts) {
+	if (typeid(float).name() == typeid(TDAT).name()) {
+		int32_t type_id = -2;
+		output_file.write((char*)&type_id, sizeof(int32_t));
+		int32_t rows_ts = ts->rows();
+		int32_t cols_ts = ts->cols();
+		int32_t slis_ts = ts->slis();
+		int32_t gros_ts = ts->gros();
+		int numel_ts = ts->numel();
+		TDAT* data_ts = ts->data();
+		output_file.write((char*)&rows_ts, sizeof(int32_t));
+		output_file.write((char*)&cols_ts, sizeof(int32_t));
+		output_file.write((char*)&slis_ts, sizeof(int32_t));
+		output_file.write((char*)&gros_ts, sizeof(int32_t));
+		if (0 != numel_ts) {
 			float* buffer = new float[numel_ts];
 			for (int i = 0; i < numel_ts; ++i) {
 				buffer[i] = data_ts[i];
@@ -3976,19 +3964,21 @@ void SaveTensorTemplate(std::string file_name, const TensorTemplate<TDAT>& ts) {
 				buffer = nullptr;
 			}
 		}
-		else if (typeid(int32_t).name() == typeid(TDAT).name()) {
-			int32_t type_id = -1;
-			output_file.write((char*)&type_id, sizeof(int32_t));
-			int32_t rows_ts = ts.rows();
-			int32_t cols_ts = ts.cols();
-			int32_t slis_ts = ts.slis();
-			int32_t gros_ts = ts.gros();
-			int numel_ts = ts.numel();
-			TDAT* data_ts = ts.data();
-			output_file.write((char*)&rows_ts, sizeof(int32_t));
-			output_file.write((char*)&cols_ts, sizeof(int32_t));
-			output_file.write((char*)&slis_ts, sizeof(int32_t));
-			output_file.write((char*)&gros_ts, sizeof(int32_t));
+	}
+	else if (typeid(int32_t).name() == typeid(TDAT).name()) {
+		int32_t type_id = -1;
+		output_file.write((char*)&type_id, sizeof(int32_t));
+		int32_t rows_ts = ts->rows();
+		int32_t cols_ts = ts->cols();
+		int32_t slis_ts = ts->slis();
+		int32_t gros_ts = ts->gros();
+		int numel_ts = ts->numel();
+		TDAT* data_ts = ts->data();
+		output_file.write((char*)&rows_ts, sizeof(int32_t));
+		output_file.write((char*)&cols_ts, sizeof(int32_t));
+		output_file.write((char*)&slis_ts, sizeof(int32_t));
+		output_file.write((char*)&gros_ts, sizeof(int32_t));
+		if (0 != numel_ts) {
 			int32_t* buffer = new int32_t[numel_ts];
 			for (int i = 0; i < numel_ts; ++i) {
 				buffer[i] = data_ts[i];
@@ -3999,126 +3989,56 @@ void SaveTensorTemplate(std::string file_name, const TensorTemplate<TDAT>& ts) {
 				buffer = nullptr;
 			}
 		}
-		else {
-			#ifdef TENSOR_DEBUG
-			T_ERROR("File creation failed.\n");
-			#endif
+	}
+	else if (typeid(uint8_t).name() == typeid(TDAT).name()) {
+		int32_t type_id = -3;
+		output_file.write((char*)&type_id, sizeof(int32_t));
+		int32_t rows_ts = ts->rows();
+		int32_t cols_ts = ts->cols();
+		int32_t slis_ts = ts->slis();
+		int32_t gros_ts = ts->gros();
+		int numel_ts = ts->numel();
+		TDAT* data_ts = ts->data();
+		output_file.write((char*)&rows_ts, sizeof(int32_t));
+		output_file.write((char*)&cols_ts, sizeof(int32_t));
+		output_file.write((char*)&slis_ts, sizeof(int32_t));
+		output_file.write((char*)&gros_ts, sizeof(int32_t));
+		if (0 != numel_ts) {
+			uint8_t* buffer = new uint8_t[numel_ts];
+			for (int i = 0; i < numel_ts; ++i) {
+				buffer[i] = data_ts[i];
+			}
+			output_file.write((char*)buffer, numel_ts * sizeof(uint8_t));
+			if (nullptr != buffer) {
+				delete [] buffer;
+				buffer = nullptr;
+			}
 		}
 	}
-	output_file.close();
+	else {
+		#ifdef TENSOR_DEBUG
+		T_ERROR("Unsupported type.\n");
+		#endif
+	}
 }
 
 
 template <typename TDAT>
-void SaveTensorsTemplate(std::string file_name, const std::vector<TensorTemplate<TDAT> >& tensor_group) {
-	if (tensor_group.size() == 0) {
-		return;
-	}
-	std::ofstream output_file(file_name, std::ios::out | std::ios::binary);
-	if(!output_file) {
-		#ifdef TENSOR_DEBUG
-		T_ERROR("File creation failed.\n");
-		#endif
-	}
-	else {
-		int32_t num_tensors = tensor_group.size();
-		int32_t cell_type = 1;
-		int32_t cell_x = num_tensors;
-		int32_t cell_y = 1;
-		output_file.write((char*)&cell_type, sizeof(int32_t));
-		output_file.write((char*)&cell_x, sizeof(int32_t));
-		output_file.write((char*)&cell_y, sizeof(int32_t));
-
-		if (typeid(float).name() == typeid(TDAT).name()) {
-			int32_t type_id = -2;
-			output_file.write((char*)&type_id, sizeof(int32_t));
-			for (int32_t cell_iter = 0; cell_iter < num_tensors; ++ cell_iter) {
-				int32_t rows_ts = tensor_group[cell_iter].rows();
-				int32_t cols_ts = tensor_group[cell_iter].cols();
-				int32_t slis_ts = tensor_group[cell_iter].slis();
-				int32_t gros_ts = tensor_group[cell_iter].gros();
-				int numel_ts = tensor_group[cell_iter].numel();
-				TDAT* data_ts = tensor_group[cell_iter].data();
-				output_file.write((char*)&rows_ts, sizeof(int32_t));
-				output_file.write((char*)&cols_ts, sizeof(int32_t));
-				output_file.write((char*)&slis_ts, sizeof(int32_t));
-				output_file.write((char*)&gros_ts, sizeof(int32_t));
-				float* buffer = new float[numel_ts];
-				for (int i = 0; i < numel_ts; ++i) {
-					buffer[i] = data_ts[i];
-				}
-				output_file.write((char*)buffer, numel_ts * sizeof(float));
-				if (nullptr != buffer) {
-					delete [] buffer;
-					buffer = nullptr;
-				}
-			}
-		}
-		else if (typeid(int32_t).name() == typeid(TDAT).name()) {
-			int32_t type_id = -1;
-			output_file.write((char*)&type_id, sizeof(int32_t));
-			for (int32_t cell_iter = 0; cell_iter < num_tensors; ++ cell_iter) {
-				int32_t rows_ts = tensor_group[cell_iter].rows();
-				int32_t cols_ts = tensor_group[cell_iter].cols();
-				int32_t slis_ts = tensor_group[cell_iter].slis();
-				int32_t gros_ts = tensor_group[cell_iter].gros();
-				int numel_ts = tensor_group[cell_iter].numel();
-				TDAT* data_ts = tensor_group[cell_iter].data();
-				output_file.write((char*)&rows_ts, sizeof(int32_t));
-				output_file.write((char*)&cols_ts, sizeof(int32_t));
-				output_file.write((char*)&slis_ts, sizeof(int32_t));
-				output_file.write((char*)&gros_ts, sizeof(int32_t));
-				int32_t* buffer = new int32_t[numel_ts];
-				for (int i = 0; i < numel_ts; ++i) {
-					buffer[i] = data_ts[i];
-				}
-				output_file.write((char*)buffer, numel_ts * sizeof(int32_t));
-				if (nullptr != buffer) {
-					delete [] buffer;
-					buffer = nullptr;
-				}
-			}
-		}
-		else {
-			#ifdef TENSOR_DEBUG
-			T_ERROR("Type NOT supported.\n");
-			#endif
-		}
-	}
-	output_file.close();
-}
-
-
-template <typename TDAT>
-TensorTemplate<TDAT> LoadTensorTemplate(std::string file_name) {
-	TensorTemplate<TDAT> ts;
-	std::ifstream input_file(file_name, std::ios::in | std::ios::binary);
-	if(!input_file) {
-		#ifdef TENSOR_DEBUG
-		T_ERROR("File does NOT exist.\n");
-		#endif
-	}
-	else {
-		int32_t cell_type = 0;
-		int32_t cell_x = 0;
-		int32_t cell_y = 0;
-		int32_t type_id = 0;
-		input_file.read((char *)&cell_type, sizeof(int32_t));
-		input_file.read((char *)&cell_x, sizeof(int32_t));
-		input_file.read((char *)&cell_y, sizeof(int32_t));
-		input_file.read((char *)&type_id, sizeof(int32_t));
-
-		int32_t rows_ts = 0;
-		int32_t cols_ts = 0;
-		int32_t slis_ts = 0;
-		int32_t gros_ts = 0;
-		input_file.read((char *)&rows_ts, sizeof(int32_t));
-		input_file.read((char *)&cols_ts, sizeof(int32_t));
-		input_file.read((char *)&slis_ts, sizeof(int32_t));
-		input_file.read((char *)&gros_ts, sizeof(int32_t));
-		ts.Resize(rows_ts, cols_ts, slis_ts, gros_ts);
-		int numel_ts = ts.numel();
-		TDAT* data_ts = ts.data();
+void ReadTensorTemplate(std::ifstream& input_file, TensorTemplate<TDAT>* ts) {
+	int32_t type_id = 0;
+	int32_t rows_ts = 0;
+	int32_t cols_ts = 0;
+	int32_t slis_ts = 0;
+	int32_t gros_ts = 0;
+	input_file.read((char *)&type_id, sizeof(int32_t));
+	input_file.read((char *)&rows_ts, sizeof(int32_t));
+	input_file.read((char *)&cols_ts, sizeof(int32_t));
+	input_file.read((char *)&slis_ts, sizeof(int32_t));
+	input_file.read((char *)&gros_ts, sizeof(int32_t));
+	ts->Resize(rows_ts, cols_ts, slis_ts, gros_ts);
+	int numel_ts = ts->numel();
+	TDAT* data_ts = ts->data();
+	if (0 != numel_ts) {
 		if (type_id == -2) {
 			float* buffer = new float[numel_ts];
 			input_file.read((char *)buffer, numel_ts * sizeof(float));
@@ -4141,11 +4061,88 @@ TensorTemplate<TDAT> LoadTensorTemplate(std::string file_name) {
 				buffer = nullptr;
 			}
 		}
+		else if (type_id == -3) {
+			uint8_t* buffer = new uint8_t[numel_ts];
+			input_file.read((char *)buffer, numel_ts * sizeof(uint8_t));
+			for (int i = 0; i < numel_ts; ++i) {
+				data_ts[i] = buffer[i];
+			}
+			if (nullptr != buffer) {
+				delete [] buffer;
+				buffer = nullptr;
+			}
+		}
 		else {
 			#ifdef TENSOR_DEBUG
 			T_ERROR("Type error in file loading.\n");
 			#endif
 		}
+	}
+}
+
+
+template <typename TDAT>
+void SaveTensorTemplate(std::string file_name, TensorTemplate<TDAT>* ts) {
+	std::ofstream output_file(file_name, std::ios::out | std::ios::binary);
+	if(!output_file) {
+		#ifdef TENSOR_DEBUG
+		T_ERROR("File creation failed.\n");
+		#endif
+	}
+	else {
+		int32_t cell_type = 0;
+		int32_t cell_x = 1;
+		int32_t cell_y = 1;
+		output_file.write((char*)&cell_type, sizeof(int32_t));
+		output_file.write((char*)&cell_x, sizeof(int32_t));
+		output_file.write((char*)&cell_y, sizeof(int32_t));
+		WriteTensorTemplate<TDAT>(output_file, ts);
+	}
+	output_file.close();
+}
+
+
+template <typename TDAT>
+void SaveTensorsTemplate(std::string file_name, std::vector<TensorTemplate<TDAT> >* tensor_group) {
+	std::ofstream output_file(file_name, std::ios::out | std::ios::binary);
+	if(!output_file) {
+		#ifdef TENSOR_DEBUG
+		T_ERROR("File creation failed.\n");
+		#endif
+	}
+	else {
+		int32_t cell_type = 1;
+		int32_t cell_x = tensor_group->size();
+		int32_t cell_y = 1;
+		output_file.write((char*)&cell_type, sizeof(int32_t));
+		output_file.write((char*)&cell_x, sizeof(int32_t));
+		output_file.write((char*)&cell_y, sizeof(int32_t));
+
+		for (auto cell_iter = tensor_group->begin(); cell_iter != tensor_group->end(); ++cell_iter) {
+			WriteTensorTemplate<TDAT>(output_file, &(*cell_iter));
+		}
+	}
+	output_file.close();
+}
+
+
+template <typename TDAT>
+TensorTemplate<TDAT> LoadTensorTemplate(std::string file_name) {
+	TensorTemplate<TDAT> ts;
+	std::ifstream input_file(file_name, std::ios::in | std::ios::binary);
+	if(!input_file) {
+		#ifdef TENSOR_DEBUG
+		T_ERROR("File does NOT exist.\n");
+		#endif
+	}
+	else {
+		int32_t cell_type = 0;
+		int32_t cell_x = 0;
+		int32_t cell_y = 0;
+		input_file.read((char*)&cell_type, sizeof(int32_t));
+		input_file.read((char*)&cell_x, sizeof(int32_t));
+		input_file.read((char*)&cell_y, sizeof(int32_t));
+		ReadTensorTemplate<TDAT>(input_file, &ts);
 	}
 	input_file.close();
 	return ts;
@@ -4166,53 +4163,15 @@ std::vector<TensorTemplate<TDAT> > LoadTensorsTemplate(std::string file_name) {
 		int32_t cell_type = 0;
 		int32_t cell_x = 0;
 		int32_t cell_y = 0;
-		int32_t type_id = 0;
-		input_file.read((char *)&cell_type, sizeof(int32_t));
-		input_file.read((char *)&cell_x, sizeof(int32_t));
-		input_file.read((char *)&cell_y, sizeof(int32_t));
-		input_file.read((char *)&type_id, sizeof(int32_t));
+		input_file.read((char*)&cell_type, sizeof(int32_t));
+		input_file.read((char*)&cell_x, sizeof(int32_t));
+		input_file.read((char*)&cell_y, sizeof(int32_t));
 		if (cell_type) {
 			num_tensors = cell_x * cell_y;
 		}
-		for (int32_t cell_iter = 0; cell_iter < num_tensors; ++cell_iter) {
-			int32_t rows_ts = 0;
-			int32_t cols_ts = 0;
-			int32_t slis_ts = 0;
-			int32_t gros_ts = 0;
-			input_file.read((char *)&rows_ts, sizeof(int32_t));
-			input_file.read((char *)&cols_ts, sizeof(int32_t));
-			input_file.read((char *)&slis_ts, sizeof(int32_t));
-			input_file.read((char *)&gros_ts, sizeof(int32_t));
-			TensorTemplate<TDAT> ts = RawTemplate<TDAT>(rows_ts, cols_ts, slis_ts, gros_ts);
-			int numel_ts = ts.numel();
-			TDAT* data_ts = ts.data();
-			if (type_id == -2) {
-				float* buffer = new float[numel_ts];
-				input_file.read((char *)buffer, numel_ts * sizeof(float));
-				for (int i = 0; i < numel_ts; ++i) {
-					data_ts[i] = buffer[i];
-				}
-				if (nullptr != buffer) {
-					delete [] buffer;
-					buffer = nullptr;
-				}
-			}
-			else if (type_id == -1) {
-				int32_t* buffer = new int32_t[numel_ts];
-				input_file.read((char *)buffer, numel_ts * sizeof(int32_t));
-				for (int i = 0; i < numel_ts; ++i) {
-					data_ts[i] = buffer[i];
-				}
-				if (nullptr != buffer) {
-					delete [] buffer;
-					buffer = nullptr;
-				}
-			}
-			else {
-				#ifdef TENSOR_DEBUG
-				T_ERROR("Type error in file loading.\n");
-				#endif
-			}
+		for (int cell_iter = 0; cell_iter < num_tensors; ++cell_iter) {
+			TensorTemplate<TDAT> ts;
+			ReadTensorTemplate<TDAT>(input_file, &ts);
 			tensor_group.push_back(ts);
 		}
 	}
@@ -4273,8 +4232,10 @@ Tensor MaxPool2d(const Tensor& a, int k = 2, Tensor* mask = nullptr);
 Tensor Conv2dBase(const Tensor& a, const Tensor& k);
 Tensor Conv2d(const Tensor& a, const Tensor& k, int stride = 1, int padding = 0);
 Tensor ConvTranspose2d(const Tensor& a, const Tensor& k, int stride = 1, int padding = 0);
-void SaveTensor(std::string file_name, const Tensor& ts);
-void SaveTensors(std::string file_name, const std::vector<Tensor>& tensor_group);
+void WriteTensor(std::ofstream& output_file, Tensor* ts);
+void ReadTensor(std::ifstream& input_file, Tensor* ts);
+void SaveTensor(std::string file_name, Tensor* ts);
+void SaveTensors(std::string file_name, std::vector<Tensor>* tensor_group);
 Tensor LoadTensor(std::string file_name);
 std::vector<Tensor> LoadTensors(std::string file_name);
 Tensor Magic(int rows);
@@ -4422,8 +4383,10 @@ Tensor MaxPool2d(const Tensor& a, int k = 2, Tensor* mask = nullptr);
 Tensor Conv2dBase(const Tensor& a, const Tensor& k);
 Tensor Conv2d(const Tensor& a, const Tensor& k, int stride = 1, int padding = 0);
 Tensor ConvTranspose2d(const Tensor& a, const Tensor& k, int stride = 1, int padding = 0);
-void SaveTensor(std::string file_name, const Tensor& ts);
-void SaveTensors(std::string file_name, const std::vector<Tensor>& tensor_group);
+void WriteTensor(std::ofstream& output_file, Tensor* ts);
+void ReadTensor(std::ifstream& input_file, Tensor* ts);
+void SaveTensor(std::string file_name, Tensor* ts);
+void SaveTensors(std::string file_name, std::vector<Tensor>* tensor_group);
 Tensor LoadTensor(std::string file_name);
 std::vector<Tensor> LoadTensors(std::string file_name);
 Tensor Magic(int rows);

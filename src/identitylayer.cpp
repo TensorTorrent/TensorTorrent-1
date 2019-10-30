@@ -10,6 +10,7 @@ using namespace ftensor;
 
 IdentityLayer::IdentityLayer()
 : Layer() {
+	layer_type_id_ = 1;
 }
 
 

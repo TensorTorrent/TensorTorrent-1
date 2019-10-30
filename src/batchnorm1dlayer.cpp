@@ -6,10 +6,13 @@
 
 
 using namespace ftensor;
+using std::cerr;
+using std::endl;
 
 
 BatchNorm1dLayer::BatchNorm1dLayer(int num_features, float eps, float momentum)
 : Layer() {
+	layer_type_id_ = 7;
 	num_features_ = num_features;
 	eps_ = eps;
 	momentum_ = momentum;
@@ -60,4 +63,45 @@ Tensor BatchNorm1dLayer::Backward(const Tensor& gradient) {
 	dw_ = Sum(Mul(gradient, output_), 1);
 	db_ = Sum(gradient, 1);
 	return dldxi;
+}
+
+
+void BatchNorm1dLayer::ExportTo(std::ofstream& output_file) {
+	int32_t end_of_layer = END_OF_LAYER;
+	int32_t param_i[1];
+	float param_f[2];
+	param_i[0] = (int32_t)num_features_;
+	param_f[0] = eps_;
+	param_f[1] = momentum_;
+	output_file.write((char*)&layer_type_id_, sizeof(int32_t));
+	output_file.write((char*)param_i, sizeof(int32_t) * 1);
+	output_file.write((char*)param_f, sizeof(float) * 2);
+	WriteTensor(output_file, &w_);
+	WriteTensor(output_file, &b_);
+	WriteTensor(output_file, &h_e_input_);
+	WriteTensor(output_file, &h_var_input_);
+	output_file.write((char*)&end_of_layer, sizeof(int32_t));
+}
+
+
+void BatchNorm1dLayer::ImportFrom(std::ifstream& input_file) {
+	int32_t end_of_layer = 0;
+	int32_t param_i[1];
+	float param_f[2];
+	input_file.read((char*)param_i, sizeof(int32_t) * 1);
+	input_file.read((char*)param_f, sizeof(float) * 2);
+	num_features_ = (int)param_i[0];
+	eps_ = param_f[0];
+	momentum_ = param_f[1];
+	ReadTensor(input_file, &w_);
+	ReadTensor(input_file, &b_);
+	ReadTensor(input_file, &h_e_input_);
+	ReadTensor(input_file, &h_var_input_);
+	input_file.read((char *)&end_of_layer, sizeof(int32_t));
+	if (END_OF_LAYER != end_of_layer) {
+		cerr << "Error: Invalid model format." << endl;
+		exit(1);
+	}
+	dw_ = Zeros(num_features_, 1);
+	db_ = Zeros(num_features_, 1);
 }

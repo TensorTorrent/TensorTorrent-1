@@ -8,7 +8,7 @@
 using namespace ftensor;
 
 
-Adam::Adam(Sequential& model, float lr, float beta1, float beta2, float eps)
+Adam::Adam(Model& model, float lr, float beta1, float beta2, float eps)
 : Optimizer(model) {
 	lr_ = lr;
 	beta1_ = beta1;

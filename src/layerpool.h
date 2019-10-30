@@ -1,15 +1,15 @@
 // Author: Yuning Jiang
-// Date: Oct. 6 th, 2019
-// Description: An Open Source Deep Learning Framework with In-Memory Computing.
+// Date: Oct. 30 th, 2019
+// Description: Layer pool.
 
-#ifndef __TENSOR_TORRENT_H__
-#define __TENSOR_TORRENT_H__
+#ifndef __LAYER_POOL_H__
+#define __LAYER_POOL_H__
 
 
 #include <iostream>
+#include <vector>
 
 #include "tensorlib.h"
-#include "device.h"
 #include "layer.h"
 #include "conv2dlayer.h"
 #include "convtranspose2dlayer.h"
@@ -25,16 +25,23 @@
 #include "batchnorm2dlayer.h"
 #include "identitylayer.h"
 #include "sequential.h"
-#include "optimizer.h"
-#include "adam.h"
-#include "loss.h"
-#include "crossentropyloss.h"
-#include "mseloss.h"
-#include "dataset.h"
-#include "mnistloader.h"
-#include "dataloader.h"
-#include "layerpool.h"
-#include "model.h"
 
 
-#endif  // __TENSOR_TORRENT_H__
+class LayerPool {
+public:
+	static LayerPool &GetInstance();
+	void Append(Layer* layer);
+	void Clear();
+
+private:
+	LayerPool();
+	~LayerPool();
+	LayerPool(const LayerPool &layer_pool);
+	const LayerPool &operator=(const LayerPool &layer_pool);
+
+	std::vector<Layer*> layers_;
+	int n_layers_;
+};
+
+
+#endif  // __LAYER_POOL_H__

@@ -19,6 +19,9 @@ public:
 
 	ftensor::Tensor Forward(const ftensor::Tensor& input_image);
 	ftensor::Tensor Backward(const ftensor::Tensor& gradient);
+
+	void ExportTo(std::ofstream& output_file);
+	void ImportFrom(std::ifstream& input_file);
 	
 protected:
 	int in_features_;

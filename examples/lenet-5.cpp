@@ -8,7 +8,7 @@ using namespace std;
 
 
 const int kBatchSize = 100;
-const int kNumEpochs = 1;
+const int kNumEpochs = 30;
 
 
 int main() {
@@ -43,11 +43,14 @@ int main() {
 	SoftmaxLayer s18;
 	
 	// Construct the model
-	Sequential net({&c1, &b2, &r3, &m4, &c5, &b6, &r7, &m8, &f9, &l10, &b11, &r12, &l13, &b14, &r15, &l16, &b17, &s18});
+	Model net({&c1, &b2, &r3, &m4, &c5, &b6, &r7, &m8, &f9, &l10, &b11, &r12, &l13, &b14, &r15, &l16, &b17, &s18});
+
+	//net = Load("LeNet-5.ttm");
 
 	// Optimizer and loss function
 	Adam optimizer(net);
 	CrossEntropyLoss criterion;
+	float maximum_accuracy = 0.0;
 
 	for (int i_epoch = 0; i_epoch < kNumEpochs + 1; ++i_epoch) {
 		start = clock();
@@ -107,7 +110,12 @@ int main() {
 
 		end = clock();
 		cout << "Time elapsed: " << fixed << setprecision(9) << ((double)(end - start) / CLOCKS_PER_SEC) << " s." << endl << endl;
+
+		if (test_accuracy > maximum_accuracy) {
+			maximum_accuracy = test_accuracy;
+			Save(&net, "LeNet-5.ttm");
+		}
 	}
-	
+
 	return 0;
 }
