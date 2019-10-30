@@ -9,6 +9,7 @@ using namespace ftensor;
 
 
 Optimizer::Optimizer(Model& model) {
+	lr_ = 0.0;
 	layers_ = model.GetLayers();
 	n_layers_ = model.GetLayerNum();
 }

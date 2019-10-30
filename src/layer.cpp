@@ -12,6 +12,7 @@ using std::endl;
 
 Layer::Layer() {
 	layer_type_id_ = 0;
+	batch_size_ = 1;
 	is_first_layer_ = true;
 	previous_layer_ = nullptr;
 	has_weight_ = false;

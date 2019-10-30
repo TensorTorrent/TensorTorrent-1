@@ -32,9 +32,9 @@ LinearLayer::~LinearLayer() {
 
 
 Tensor LinearLayer::Forward(const Tensor& input_image) {
+	batch_size_ = input_image.cols();
 	if (has_bias_) {
-		int batch_size = input_image.cols();
-		return MM(w_, input_image) + Repmat(b_, 1, batch_size, 1, 1);
+		return MM(w_, input_image) + Repmat(b_, 1, batch_size_, 1, 1);
 	}
 	else {
 		return MM(w_, input_image);
@@ -44,13 +44,13 @@ Tensor LinearLayer::Forward(const Tensor& input_image) {
 
 Tensor LinearLayer::Backward(const Tensor& gradient) {
 	if (is_first_layer_) {
-		dw_ += MM(gradient, Transpose(input_));
+		dw_ += MM(gradient, Transpose(input_)) / (1.0 * batch_size_);
 	}
 	else {
-		dw_ += MM(gradient, Transpose(previous_layer_->GetOutput()));
+		dw_ += MM(gradient, Transpose(previous_layer_->GetOutput())) / (1.0 * batch_size_);
 	}
 	if (has_bias_) {
-		db_ += Sum(gradient, 1);
+		db_ += Sum(gradient, 1) / (1.0 * batch_size_);
 	}
 	return MM(Transpose(w_), gradient);
 }

@@ -20,7 +20,11 @@ public:
 	void ZeroGrad();
 	virtual void Step() = 0;
 
+	float GetLearningRate() const {return lr_;}
+	void SetLearningRate(float lr) {lr_ = lr;}
+
 protected:
+	float lr_;
 	std::vector<Layer*> layers_;
 	int n_layers_;
 };

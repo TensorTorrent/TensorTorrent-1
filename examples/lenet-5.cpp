@@ -7,7 +7,7 @@ using namespace ftensor;
 using namespace std;
 
 
-const int kBatchSize = 100;
+const int kBatchSize = 50;
 const int kNumEpochs = 30;
 
 
@@ -48,7 +48,9 @@ int main() {
 	//net = Load("LeNet-5.ttm");
 
 	// Optimizer and loss function
-	Adam optimizer(net);
+	SGD optimizer(net, 0.01);
+	vector<int> milestones = {15, 25};
+	MultiStepLR scheduler(&optimizer, milestones);
 	CrossEntropyLoss criterion;
 	float maximum_accuracy = 0.0;
 
@@ -107,6 +109,9 @@ int main() {
 		float test_accuracy = 100.0 * test_correct / test_total;
 		cout << "\n[Test]   Epoch:" << i_epoch << "\t\t-\t\tLoss: " << fixed << setprecision(4) << test_loss << "\t\t-\t\tAccuracy: ";
 		cout << setprecision(2) << test_accuracy << "%" << endl << flush;
+
+		// Update the learning rate
+		scheduler.Step();
 
 		end = clock();
 		cout << "Time elapsed: " << fixed << setprecision(9) << ((double)(end - start) / CLOCKS_PER_SEC) << " s." << endl << endl;

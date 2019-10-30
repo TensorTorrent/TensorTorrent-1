@@ -55,6 +55,7 @@ public:
 
 protected:
 	int32_t layer_type_id_;
+	int batch_size_;
 	bool is_first_layer_;
 	bool has_weight_;
 	bool has_bias_;

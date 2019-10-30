@@ -26,7 +26,6 @@ public:
 protected:
 	int shape_[4];
 	int num_features_;
-	int batch_size_;
 	float eps_;
 	float momentum_;
 	ftensor::Tensor e_input_;

@@ -60,8 +60,8 @@ Tensor BatchNorm1dLayer::Backward(const Tensor& gradient) {
 	Tensor dldob2 = Sum(Mul(Mul(-0.5 * dldxh, xi_ - r_e_input_), Pow(r_var_input_ + eps_, -1.5)), 1);
 	Tensor dldub = Sum(Mul(dldxh, Div(-1.0, Sqrt(r_var_input_ + eps_))), 1) + Mul(dldob2, Sum(-2.0 * (xi_ - r_e_input_), 1));
 	Tensor dldxi = Mul(dldxh, Div(1.0, Sqrt(r_var_input_ + eps_))) + Mul(Repmat(dldob2, 1, batch_size_, 1, 1), Mul(xi_ - r_e_input_, 2.0 / batch_size_)) + Mul(Repmat(dldub, 1, batch_size_, 1, 1), 1.0 / batch_size_);
-	dw_ = Sum(Mul(gradient, output_), 1);
-	db_ = Sum(gradient, 1);
+	dw_ = Sum(Mul(gradient, output_), 1) / (1.0 * batch_size_);
+	db_ = Sum(gradient, 1) / (1.0 * batch_size_);
 	return dldxi;
 }
 

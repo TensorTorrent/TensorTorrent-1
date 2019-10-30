@@ -35,6 +35,7 @@ Conv2dLayer::~Conv2dLayer() {
 
 
 Tensor Conv2dLayer::Forward(const Tensor& input) {
+	batch_size_ = input.gros();
 	if (has_bias_) {
 		Tensor temp = Conv2d(input, w_, stride_, padding_);
 		return temp + Repmat(b_, temp.rows(), temp.cols(), 1, temp.gros());
@@ -50,7 +51,7 @@ Tensor Conv2dLayer::Backward(const Tensor& gradient) {
 	auto grad = gradient;
 	if (has_bias_) {
 		for (int i_kernel = 0; i_kernel < out_channels_; ++i_kernel) {
-			db_(0, 0, i_kernel, 0) += Sum(grad.S(-1, -1, -1, -1, i_kernel, i_kernel + 1, -1, -1)).Item();
+			db_(0, 0, i_kernel, 0) += Sum(grad.S(-1, -1, -1, -1, i_kernel, i_kernel + 1, -1, -1)).Item() / (1.0 * batch_size_);
 		}
 	}
 	for (int i_kernel = 0; i_kernel < out_channels_; ++i_kernel) {
@@ -61,7 +62,7 @@ Tensor Conv2dLayer::Backward(const Tensor& gradient) {
 			else {
 				in = previous_layer_->GetOutput();
 			}
-			Tensor dw_x = dw_.S(-1, -1, -1, -1, i_channel, i_channel + 1, i_kernel, i_kernel + 1) + Conv2d(Permute(in.S(-1, -1, -1, -1, i_channel, i_channel + 1), 0, 1, 3, 2), Permute(grad.S(-1, -1, -1, -1, i_kernel, i_kernel + 1), 0, 1, 3, 2), stride_, padding_);
+			Tensor dw_x = dw_.S(-1, -1, -1, -1, i_channel, i_channel + 1, i_kernel, i_kernel + 1) + Conv2d(Permute(in.S(-1, -1, -1, -1, i_channel, i_channel + 1), 0, 1, 3, 2), Permute(grad.S(-1, -1, -1, -1, i_kernel, i_kernel + 1), 0, 1, 3, 2), stride_, padding_) / (1.0 * batch_size_);
 			dw_.S(dw_x, -1, -1, -1, -1, i_channel, i_channel + 1, i_kernel, i_kernel + 1);
 		}
 	}

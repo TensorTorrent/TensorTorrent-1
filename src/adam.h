@@ -22,7 +22,6 @@ public:
 	void Step();
 
 protected:
-	float lr_;
 	float beta1_;
 	float beta2_;
 	float eps_;
