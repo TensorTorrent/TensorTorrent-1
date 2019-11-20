@@ -1,2 +1,2 @@
 # TensorTorrent
-An Open Source Deep Learning Framework with In-Memory Computing
+An Open Source Deep Learning Framework with In-Memory Computing Acceleration
